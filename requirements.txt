@@ -1,0 +1,6 @@
+pygame==2.6.1
+pygame-menu==4.5.1
+numpy==1.26.4
+opencv-python==4.11.0
+mediapipe==0.10.21
+firebase-admin==6.7.0
