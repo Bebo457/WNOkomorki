@@ -202,6 +202,44 @@ def validate_and_save_ip_config():
 
     return False
 
+def host_game():
+    """Funkcja obsługująca przycisk 'Hostuj grę'"""
+    print("Hostowanie gry...")
+    # Tutaj w przyszłości implementacja hostowania gry
+
+def connect_to_game():
+    """Funkcja obsługująca przycisk 'Połącz'"""
+    print(f"Łączenie z hostem: {shared.host_ip}")
+    print(f"Z maską podsieci: {shared.host_subnet_mask}")
+    # Tutaj w przyszłości implementacja łączenia z hostem
+
+def update_host_ip(value):
+    """Aktualizuje adres IP hosta, do którego będziemy się łączyć"""
+    shared.host_ip = value
+    print(f"Zaktualizowano adres IP hosta na: {shared.host_ip}")
+
+def update_host_subnet_mask(value):
+    """Aktualizuje maskę podsieci dla połączenia online"""
+    shared.host_subnet_mask = value
+    print(f"Zaktualizowano maskę podsieci na: {shared.host_subnet_mask}")
+
+def show_online_menu():
+    """Wyświetla menu gry online"""
+    shared.game_state = 'online_menu'
+    shared.menu.disable()
+    shared.online_menu.enable()
+
+def return_from_online_menu():
+    """Powrót z menu online do menu głównego"""
+    shared.game_state = 'main_menu'
+    shared.online_menu.disable()
+    shared.menu.enable()
+
+def online_menu_loop():
+    """Obsługuje menu gry online"""
+    shared.online_menu.draw(window)
+    shared.online_menu.update(shared.events)
+
 
 pygame.display.set_caption('WOJNA KOMOREK')
 
@@ -223,7 +261,7 @@ previous_LMB_state = False
 shared.menu = pygame_menu.Menu('Menu', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
 shared.menu.add.button('1 gracz', classic_mode_menu)
 shared.menu.add.button('2 graczy lokalnie', start_pvp_mode)
-shared.menu.add.button('Gra sieciowa', start_pvp_mode_online)
+shared.menu.add.button('Gra sieciowa', show_online_menu)
 shared.menu.add.button('Adres IP i port', start_ip_menu)
 shared.menu.add.button('Zapisz stan gry (XML)', level.save_game_xml)
 shared.menu.add.button('Ładuj zapis gry (XML)', level.load_game_xml)
@@ -296,6 +334,14 @@ shared.turn_button = shared.timer_menu.add.button('ODDAJ TURĘ', level.give_turn
 shared.turn_button.set_position(70, 70)
 shared.timer_menu.disable()
 
+# Inicjalizacja menu online
+shared.online_menu = pygame_menu.Menu('Gra Online', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.online_menu.add.button('Hostuj grę', host_game)
+host_ip_input = shared.online_menu.add.text_input('Adres IP: ', default=shared.host_ip, onchange=update_host_ip)
+subnet_mask_input = shared.online_menu.add.text_input('Maska podsieci: ', default=shared.host_subnet_mask, onchange=update_host_subnet_mask)
+shared.online_menu.add.button('Połącz', connect_to_game)
+shared.online_menu.add.button('Powrót', return_from_online_menu)
+
 # Inicjalizacja menu nagrania
 shared.recordings_menu = pygame_menu.Menu('Wybierz nagranie', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
 
@@ -336,6 +382,8 @@ while True:
         main_menu()
     elif shared.game_state == 'level_menu':
         level_menu_loop()
+    elif shared.game_state == 'online_menu':
+        online_menu_loop()
     elif shared.game_state == 'level_classic' or shared.game_state == 'pvp_end':
         level.level_loop()
     elif shared.game_state == 'pvp_setup':
@@ -351,6 +399,7 @@ while True:
             level.playback_loop()
         else:
             shared.game_state = 'main_menu'
+
 
     pygame.display.flip()
     shared.clock.tick(60)
