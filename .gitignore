@@ -2,3 +2,4 @@ json_saves/
 playback_recordings/
 saves/
 .venv/
+__pycache__/

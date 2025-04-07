@@ -5,6 +5,7 @@ import shared
 import pygame
 import pygame_menu
 from config_manager import ConfigManager
+import online
 
 # Inicjalizacja Pygame
 pygame.init()
@@ -202,17 +203,6 @@ def validate_and_save_ip_config():
 
     return False
 
-def host_game():
-    """Funkcja obsługująca przycisk 'Hostuj grę'"""
-    print("Hostowanie gry...")
-    # Tutaj w przyszłości implementacja hostowania gry
-
-def connect_to_game():
-    """Funkcja obsługująca przycisk 'Połącz'"""
-    print(f"Łączenie z hostem: {shared.host_ip}")
-    print(f"Z maską podsieci: {shared.host_subnet_mask}")
-    # Tutaj w przyszłości implementacja łączenia z hostem
-
 def update_host_ip(value):
     """Aktualizuje adres IP hosta, do którego będziemy się łączyć"""
     shared.host_ip = value
@@ -240,6 +230,10 @@ def online_menu_loop():
     shared.online_menu.draw(window)
     shared.online_menu.update(shared.events)
 
+def update_message(value):
+    """Aktualizuje wiadomość do wysłania"""
+    shared.message_to_send = value
+    print(f"Zaktualizowano wiadomość do wysłania: {shared.message_to_send}")
 
 pygame.display.set_caption('WOJNA KOMOREK')
 
@@ -336,10 +330,11 @@ shared.timer_menu.disable()
 
 # Inicjalizacja menu online
 shared.online_menu = pygame_menu.Menu('Gra Online', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
-shared.online_menu.add.button('Hostuj grę', host_game)
+shared.online_menu.add.button('Hostuj grę', online.host_game)
 host_ip_input = shared.online_menu.add.text_input('Adres IP: ', default=shared.host_ip, onchange=update_host_ip)
 subnet_mask_input = shared.online_menu.add.text_input('Maska podsieci: ', default=shared.host_subnet_mask, onchange=update_host_subnet_mask)
-shared.online_menu.add.button('Połącz', connect_to_game)
+message_input = shared.online_menu.add.text_input('Wiadomość: ', default=shared.message_to_send, onchange=update_message, maxchar=100)
+shared.online_menu.add.button('Połącz', online.connect_to_game)
 shared.online_menu.add.button('Powrót', return_from_online_menu)
 
 # Inicjalizacja menu nagrania

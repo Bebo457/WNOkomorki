@@ -109,4 +109,6 @@ frame_speed = 1
 # Domyślny adres IP hosta, do którego klient będzie się łączył
 host_ip = "127.0.0.1"
 host_subnet_mask = "255.255.255.0"
+message_to_send = "Cześć!"
+client_socket = None
 
