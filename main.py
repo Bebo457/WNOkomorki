@@ -1,6 +1,6 @@
 import sys
 from level import Level
-from shared import window_size, width_px, height_px, window
+from shared import window
 import shared
 import pygame
 import pygame_menu
@@ -9,6 +9,12 @@ import online
 
 # Inicjalizacja Pygame
 pygame.init()
+
+# Ustawianie rozmiarów ekranu (najlepiej w stosunku 1280 x 720)
+shared.height_px = 936
+shared.set_all_variables()
+window_size = (shared.width_px, shared.height_px)
+shared.window = pygame.display.set_mode(window_size, pygame.RESIZABLE)
 
 # inicjalizacja menażdżera konfiguracji
 config_manager = ConfigManager()
@@ -50,7 +56,7 @@ def start_playback(filename):
 
 def recordings_menu_loop():
     """Obsługuje menu wyboru nagrania"""
-    shared.recordings_menu.draw(window)
+    shared.recordings_menu.draw(shared.window)
     shared.recordings_menu.update(shared.events)
 
 
@@ -79,12 +85,12 @@ def return_to_main_menu():
 
 def main_menu():
     global menu
-    shared.menu.draw(window)
+    shared.menu.draw(shared.window)
     shared.menu.update(shared.events)
 
 
 def level_menu_loop():
-    shared.level_menu.draw(window)
+    shared.level_menu.draw(shared.window)
     shared.level_menu.update(shared.events)
 
 
@@ -129,7 +135,7 @@ def start_ip_menu():
 
 
 def ip_menu_loop():
-    shared.ip_menu.draw(window)
+    shared.ip_menu.draw(shared.window)
     shared.ip_menu.update(shared.events)
 
 
@@ -227,7 +233,7 @@ def return_from_online_menu():
 
 def online_menu_loop():
     """Obsługuje menu gry online"""
-    shared.online_menu.draw(window)
+    shared.online_menu.draw(shared.window)
     shared.online_menu.update(shared.events)
 
 def update_message(value):
@@ -252,7 +258,7 @@ level = Level()
 shared.game_state = 'main_menu'
 previous_LMB_state = False
 # Konfigurowanie menu
-shared.menu = pygame_menu.Menu('Menu', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.menu = pygame_menu.Menu('Menu', shared.width_px, shared.height_px, theme=pygame_menu.themes.THEME_DARK)
 shared.menu.add.button('1 gracz', classic_mode_menu)
 shared.menu.add.button('2 graczy lokalnie', start_pvp_mode)
 shared.menu.add.button('Gra sieciowa', show_online_menu)
@@ -267,14 +273,14 @@ shared.recording_button = shared.menu.add.button('Włącz nagrywanie gry', toggl
 shared.menu.add.button('Odtwórz nagranie', show_recordings_menu)
 shared.menu.add.button('Wyjście', pygame_menu.events.EXIT)
 
-shared.level_menu = pygame_menu.Menu('Wybierz Poziom', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.level_menu = pygame_menu.Menu('Wybierz Poziom', shared.width_px, shared.height_px, theme=pygame_menu.themes.THEME_DARK)
 shared.level_menu.add.button('Poziom 1', level.set_level_1)
 shared.level_menu.add.button('Poziom 2', level.set_level_2)
 shared.level_menu.add.button('Poziom 3', level.set_level_3)
 shared.level_menu.add.button('Powrót', level.return_to_main_menu)
 
 # Inicjalizacji IP_menu
-shared.ip_menu = pygame_menu.Menu('Konfiguracja połączenia', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.ip_menu = pygame_menu.Menu('Konfiguracja połączenia', shared.width_px, shared.height_px, theme=pygame_menu.themes.THEME_DARK)
 
 # Dodanie pola z adresem IP z walidacją
 ip_default = shared.ip_address if hasattr(shared, "ip_address") else "127.0.0.1"
@@ -322,14 +328,14 @@ shared.ip_menu.add.button('Zapisz konfigurację', validate_and_save_ip_config)
 shared.ip_menu.add.button('Powrót', level.return_to_main_menu)
 
 # inicjalizacja timer menu
-shared.timer_menu = pygame_menu.Menu('', shared.pvp_menu_width, 0.3 * height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.timer_menu = pygame_menu.Menu('', shared.pvp_menu_width, 0.3 * shared.height_px, theme=pygame_menu.themes.THEME_DARK)
 shared.timer_menu.set_relative_position(100, 100)
 shared.turn_button = shared.timer_menu.add.button('ODDAJ TURĘ', level.give_turn)
 shared.turn_button.set_position(70, 70)
 shared.timer_menu.disable()
 
 # Inicjalizacja menu online
-shared.online_menu = pygame_menu.Menu('Gra Online', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.online_menu = pygame_menu.Menu('Gra Online', shared.width_px, shared.height_px, theme=pygame_menu.themes.THEME_DARK)
 shared.online_menu.add.button('Hostuj grę', online.host_game)
 host_ip_input = shared.online_menu.add.text_input('Adres IP: ', default=shared.host_ip, onchange=update_host_ip)
 subnet_mask_input = shared.online_menu.add.text_input('Maska podsieci: ', default=shared.host_subnet_mask, onchange=update_host_subnet_mask)
@@ -338,7 +344,7 @@ shared.online_menu.add.button('Połącz', online.connect_to_game)
 shared.online_menu.add.button('Powrót', return_from_online_menu)
 
 # Inicjalizacja menu nagrania
-shared.recordings_menu = pygame_menu.Menu('Wybierz nagranie', width_px, height_px, theme=pygame_menu.themes.THEME_DARK)
+shared.recordings_menu = pygame_menu.Menu('Wybierz nagranie', shared.width_px, shared.height_px, theme=pygame_menu.themes.THEME_DARK)
 
 # inicjalizacja czcionki
 pygamefont = pygame.font.Font(None, 30)
@@ -347,7 +353,7 @@ shared.clock = pygame.time.Clock()
 
 # Główna pętla
 while True:
-    window.fill(shared.DARK_GRAY)
+    shared.window.fill(shared.DARK_GRAY)
     # Obliczanie FPS
     global fps
     shared.fps = shared.clock.get_fps()

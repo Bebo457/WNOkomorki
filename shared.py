@@ -1,16 +1,16 @@
 import pygame
 
 # Ustawienia okna
-width_px = 1664#1280
-height_px = 936#720
-window_size = (width_px, height_px)
-window = pygame.display.set_mode(window_size, pygame.RESIZABLE)
+width_px = None #1280
+height_px = None #720
+window_size = None
+window = None
 game_state = 'main_menu'
 game_mode = 'None'
 
 # Boczne menu trybu pvp
 pvp_menu = None
-pvp_menu_width = width_px/5
+pvp_menu_width = None
 pvp_menu_height = height_px
 timer_menu = None
 turn_button = None
@@ -89,6 +89,23 @@ move_const = 4
 cell_move_speed = 150
 # koszt ilości pixeli za 1 power ruchu komórki
 cell_move_cost = cell_radius/2
+# długość przerwy między segmentami w pikselach
+gap_length = 2
+# szerokość mostu
+br_thickness = 10
+# długość segmentu w moście
+segm_len = 40
+# wymiary menu końcowego
+end_menu_width = 400
+end_menu_height = 150
+# timers offsets
+offset1 = 150
+offset2 = 220
+# coin size
+coin_size = 40
+coin_y_offset = 10
+
+
 
 # ZMIENNE ZWIĄZANE Z ZARZĄDZANIEM KAMERĄ
 gest_cursor_radius = 10
@@ -112,3 +129,79 @@ host_subnet_mask = "255.255.255.0"
 message_to_send = "Cześć!"
 client_socket = None
 
+# szerokość / wysokość
+ASPECT_RATIO = 1.77777
+# Stałe względem wysokości ekranu
+CELL_RADIUS_RATIO = 0.0374  # 35/936
+CELL_RADIUS_TIER_RATIO = 0.0053  # 5/936
+MAX_CELL_RADIUS_RATIO = 0.0588  # 55/936
+LINE_WIDTH_RATIO = 0.0053  # 5/936
+GEST_CURSOR_RADIUS_RATIO = 0.0107  # 10/936
+MAX_MOVE_AREA_RATIO = 0.1496  # 140/936
+CELL_MOVE_SPEED_RATIO = 0.1603  # 150/936
+CELL_MOVE_COST_RATIO = 0.0187  # 17.5/936
+
+# Stałe interfejsu
+SIDE_MENU_WIDTH_RATIO = 0.2  # width_px/5 / width_px
+PVP_MENU_HEIGHT_RATIO = 1.0  # height_px / height_px
+PVP_MENU_WIDTH_RATIO = 0.2  # width_px/5 / width_px
+
+# Stałe czasowe
+TIMER_TIME = 120  # sekundy
+SPAWN_COOLDOWN = 2  # sekundy
+FRAME_SPEED = 1  # sekundy
+
+# Stałe mnożnikowe
+PVP_UNIT_MULTIPLIER = 3
+PVP_BRIDGE_MULTIPLIER = 3
+BRIDGE_BUILD_SPEED = 3  # segmenty/sekundę
+REGEN_SPEED = 0.5  # moc/sekundę/tier
+
+# Stałe gry
+TIER_CONSTANT = 10
+ATTACK_SPEED = 1
+
+
+def set_all_variables():
+    global width_px, height_px, window_size, pvp_menu_width, pvp_menu_height
+    global cell_radius, cell_radius_tier, line_width, cell_move_speed, gest_cursor_radius
+    global br_thickness, gap_length, segm_len, cell_move_cost, mnoznik, window
+    global end_menu_width, end_menu_height, offset1, offset2, coin_size, coin_y_offset
+
+
+    # Podstawowe wymiary ekranu
+    width_px = int(height_px * ASPECT_RATIO)
+    window_size = (width_px, height_px)
+    window = pygame.display.set_mode(window_size, pygame.RESIZABLE)
+
+    pvp_menu_width = width_px / 5
+
+    # Elementy komórek
+    cell_radius = int(height_px * CELL_RADIUS_RATIO)
+    cell_radius_tier = int(height_px * CELL_RADIUS_TIER_RATIO)
+
+    # Elementy interfejsu
+    pvp_menu_width = width_px * PVP_MENU_WIDTH_RATIO
+    pvp_menu_height = height_px * PVP_MENU_HEIGHT_RATIO
+
+    # Elementy graficzne
+    line_width = max(1, int(height_px * LINE_WIDTH_RATIO))
+    gest_cursor_radius = int(height_px * GEST_CURSOR_RADIUS_RATIO)
+
+    # Parametry mostu
+    br_thickness = int(height_px * LINE_WIDTH_RATIO * 2)
+    gap_length = max(1, int(height_px * 0.0021))  # 2/936
+    segm_len = int(height_px * 0.0427)  # 40/936
+
+    # Parametry ruchu
+    cell_move_speed = int(height_px * CELL_MOVE_SPEED_RATIO)
+    cell_move_cost = cell_radius / 2
+    mnoznik = 1 / fps
+
+    # Elementy UI
+    end_menu_width = int(height_px * 0.4273)  # 400/936
+    end_menu_height = int(height_px * 0.1603)  # 150/936
+    offset1 = int(height_px * 0.1603)  # 150/936
+    offset2 = int(height_px * 0.2350)  # 220/936
+    coin_size = int(height_px * 0.0427)  # 40/936
+    coin_y_offset = int(height_px * 0.0107)  # 10/936

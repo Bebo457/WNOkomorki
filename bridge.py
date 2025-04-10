@@ -7,14 +7,14 @@ from shared import fps, bridge_build_speed, mnoznik, attack_speed, spawn_cooldow
 import cell
 
 class Bridge:
-    def __init__(self, parent, destination, segm_len=40):
+    def __init__(self, parent, destination):
         self.color = parent.color
         self.length = 0
         self.parent = parent
         self.destination = destination
         self.start_pos = parent.position
         self.end_pos = destination.position
-        self.segm_len = segm_len
+        self.segm_len = shared.segm_len
         self.len_px = 0
         self.len = 0
         self.finished = False
@@ -33,8 +33,8 @@ class Bridge:
         vector = self.end_pos - self.start_pos
         self.versor = vector / np.linalg.norm(vector)
         # wartości w pixelach
-        self.thickness = 10
-        self.gap_length = 2
+        self.thickness = shared.br_thickness
+        self.gap_length = shared.gap_length
         # faktyczny początek i koniec rysowanego mostu
         self.real_start = self.start_pos + self.versor * self.parent.radius
         self.real_end = self.real_start

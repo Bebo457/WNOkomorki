@@ -63,7 +63,7 @@ class Level:
         self.players = [player1, player2]
 
         # menu końca gry
-        self.end_menu = pygame_menu.Menu('', 400, 150 , theme=pygame_menu.themes.THEME_DARK)
+        self.end_menu = pygame_menu.Menu('', shared.end_menu_width, shared.end_menu_height , theme=pygame_menu.themes.THEME_DARK)
         self.end_menu.disable()
         self.end_menu.set_relative_position(50, 70)
         self.end_menu.add.button("Powrót do menu", self.return_to_main_menu)
@@ -263,10 +263,10 @@ class Level:
         shared.window.blit(text_surface, (text_x, text_y))  # Wyświetlenie napisu na ekranie
 
         # Rysowanie obrazka z teksturą "coin_texture"
-        coin_size = 40
+        coin_size = shared.coin_size
         coin_texture = pygame.transform.scale(shared.coin_texture, (coin_size, coin_size))  # Skalowanie tekstury monety
         coin_x = self.game_area_width + (self.side_menu_width // 2 - text_surface.get_width() // 2) + text_surface.get_width() + 10  # Obok napisu
-        coin_y = 0.65 * self.game_area_height - 10 # Pozycja równoległa do napisu "Monety"
+        coin_y = 0.65 * self.game_area_height - shared.coin_y_offset # Pozycja równoległa do napisu "Monety"
         shared.window.blit(coin_texture, (coin_x, coin_y))  # Wyświetlenie monety obok napisu
 
         # rysowanie powierzchni pola walki
@@ -702,8 +702,8 @@ class Level:
             timer1_surface = font.render(timer1_text, True, shared.GRAY)
             timer2_surface = font.render(timer2_text, True, shared.RED)
 
-        shared.window.blit(timer1_surface, (0.85 * shared.width_px, self.game_area_height * 0.7 + 150))
-        shared.window.blit(timer2_surface, (0.85 * shared.width_px, self.game_area_height * 0.7 + 220))
+        shared.window.blit(timer1_surface, (0.85 * shared.width_px, self.game_area_height * 0.7 + shared.offset1))
+        shared.window.blit(timer2_surface, (0.85 * shared.width_px, self.game_area_height * 0.7 + shared.offset2))
 
     def give_turn(self):
         if shared.game_state == 'pvp_setup':
