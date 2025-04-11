@@ -20,6 +20,7 @@ ip_menu = None
 saves_menu = None
 load_menu = None
 online_menu = None
+online_status_label = None
 
 # zmienne myszki
 LMB = False
@@ -116,6 +117,12 @@ cap = None
 ip_address = "127.0.0.1"
 port = 8080
 subnet_mask = "255.255.255.0"
+active_connection = False
+received_client_message = False
+is_host = False
+client_ip = None
+client_port = None
+host_address = None
 
 # przycisk do nagrywania
 recording_button = None

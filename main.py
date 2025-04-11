@@ -1,6 +1,5 @@
 import sys
 from level import Level
-from shared import window
 import shared
 import pygame
 import pygame_menu
@@ -227,6 +226,8 @@ def show_online_menu():
 
 def return_from_online_menu():
     """Powrót z menu online do menu głównego"""
+    shared.online_status_label.set_title(" ")
+    shared.is_host = False
     shared.game_state = 'main_menu'
     shared.online_menu.disable()
     shared.menu.enable()
@@ -235,6 +236,8 @@ def online_menu_loop():
     """Obsługuje menu gry online"""
     shared.online_menu.draw(shared.window)
     shared.online_menu.update(shared.events)
+    online.handle_incoming_connection()
+
 
 def update_message(value):
     """Aktualizuje wiadomość do wysłania"""
@@ -341,6 +344,7 @@ host_ip_input = shared.online_menu.add.text_input('Adres IP: ', default=shared.h
 subnet_mask_input = shared.online_menu.add.text_input('Maska podsieci: ', default=shared.host_subnet_mask, onchange=update_host_subnet_mask)
 message_input = shared.online_menu.add.text_input('Wiadomość: ', default=shared.message_to_send, onchange=update_message, maxchar=100)
 shared.online_menu.add.button('Połącz', online.connect_to_game)
+shared.online_status_label = shared.online_menu.add.label(' ')
 shared.online_menu.add.button('Powrót', return_from_online_menu)
 
 # Inicjalizacja menu nagrania
@@ -393,6 +397,8 @@ while True:
         level.pvp_loop()
     elif shared.game_state == 'ip_menu':
         ip_menu_loop()
+    elif shared.game_state == 'online_game':
+        print("online")
     elif shared.game_state == 'recordings_menu':
         recordings_menu_loop()
     elif shared.game_state == 'playback':
