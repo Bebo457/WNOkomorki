@@ -13,6 +13,7 @@ from save_system_xml import SaveSystemXML
 # from save_system_firebase import SaveSystemFirebase
 from save_system_json import SaveSystemJSON
 from game_playback import GamePlayback
+import online
 
 
 class Player:
@@ -753,6 +754,23 @@ class Level:
             # Dodajemy snapshot na początku każdej nowej tury
             if self.playback.recording_enabled:
                 self.playback.capture_snapshot()
+        elif shared.game_state == 'online_setup':
+            if self.active_player == 0:
+                self.change_active_player()
+                self.online_active = False
+                online.send_game_state_to_client()
+            else:
+                self.change_active_player()
+                shared.game_state = 'pvp_turn'
+                self.is_shop_open = False
+                self.shop_menu.disable()
+                shared.pvp_menu.disable()
+                shared.timer_menu.enable()
+                self.pvp_main_menu.enable()
+
+                # Dodajemy snapshot na początku pierwszej tury
+                if self.playback.recording_enabled:
+                    self.playback.capture_snapshot()
 
 
     def change_active_player(self):

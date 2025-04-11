@@ -82,6 +82,9 @@ def receive_messages(client_socket):
                 json_data = message[11:]  # Usuń prefix "GAME_STATE:"
                 print("Otrzymano stan gry od hosta")
                 process_game_state(json_data)
+                shared.level.online_active = True
+                if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
+                    shared.level.online_active = False
             else:
                 print(f"Otrzymano: {message}")
                 # Zapisz wiadomość i ustaw flagę
