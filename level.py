@@ -1041,7 +1041,6 @@ class Level:
         Funkcja analogiczna do pvp_loop_setup dla trybu online
         Obsługuje fazę stawiania komórek w trybie online
         """
-        print("wlazłem")
         click = shared.click
         LMB = shared.LMB
         RMB = shared.RMB
@@ -1139,6 +1138,17 @@ class Level:
         for cell in self.cells:
             cell.draw(shared.window, shared.font)
 
+    def pvp_side_menu_setup(self):
+        global menu
+        shared.menu.disable()
+        shared.pvp_menu = pygame_menu.Menu('WYBÓR KOMÓREK STARTOWYCH', shared.pvp_menu_width,
+                                           0.7 * shared.pvp_menu_height,
+                                           theme=pygame_menu.themes.THEME_DARK)
+        shared.pvp_menu.widget_alignment = 'align_top'
+        shared.pvp_menu.set_relative_position(100, 0)
+        shared.pvp_menu.add.button('Sklep', self.activate_shop)
+        shared.pvp_menu.add.button('Powrót', self.return_to_main_menu)
+        shared.timer_menu.enable()
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):
     x1, y1 = start_pos
@@ -1230,6 +1240,7 @@ def draw_game_over_message(screen, winner_name, color):
     # Rysowanie tła za tekstem (opcjonalnie, np. czarny prostokąt)
     pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))  # Tło powiększone o 20 pikseli z każdej strony
     screen.blit(text_surface, text_rect)  # Rysowanie tekstu na ekranie
+
 
 
 
