@@ -390,7 +390,7 @@ while True:
         level_menu_loop()
     elif shared.game_state == 'online_menu':
         online_menu_loop()
-    elif shared.game_state == 'level_classic' or shared.game_state == 'pvp_end':
+    elif shared.game_state == 'level_classic':
         level.level_loop()
     elif shared.game_state == 'pvp_setup':
         level.pvp_loop_setup()
