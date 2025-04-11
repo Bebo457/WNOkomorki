@@ -8,6 +8,9 @@ window = None
 game_state = 'main_menu'
 game_mode = 'None'
 
+# obiekt klasy poziom
+level = None
+
 # Boczne menu trybu pvp
 pvp_menu = None
 pvp_menu_width = None

@@ -258,6 +258,7 @@ shared.coin_texture = pygame.image.load(coin_texture_path).convert_alpha()
 
 # Inicjalizacja klasy poziomu
 level = Level()
+shared.level = level
 shared.game_state = 'main_menu'
 previous_LMB_state = False
 # Konfigurowanie menu
