@@ -20,7 +20,7 @@ class SaveSystemJSON:
         if not os.path.exists(self.save_directory):
             os.makedirs(self.save_directory)
 
-    def _convert_to_serializable(self, data):
+    def convert_to_serializable(self, data):
         """Konwertuje obiekty NumPy array i inne niestandardowe typy na typy serializowalne."""
         if isinstance(data, np.ndarray):
             return data.tolist()
@@ -29,9 +29,9 @@ class SaveSystemJSON:
         elif isinstance(data, (np.float_, np.float16, np.float32, np.float64)):
             return float(data)
         elif isinstance(data, dict):
-            return {k: self._convert_to_serializable(v) for k, v in data.items()}
+            return {k: self.convert_to_serializable(v) for k, v in data.items()}
         elif isinstance(data, list) or isinstance(data, tuple):
-            return [self._convert_to_serializable(item) for item in data]
+            return [self.convert_to_serializable(item) for item in data]
         return data
 
     def save_game(self, return_data=False):
@@ -76,12 +76,12 @@ class SaveSystemJSON:
                     "power": float(cell.power),
                     "tier": cell.tier,
                     "color": cell.color,
-                    "position": self._convert_to_serializable(cell.position),
+                    "position": self.convert_to_serializable(cell.position),
                     "activated_connection": cell.activated_connection,
                     "enemy_connections": cell.enemy_connections,
                     "last_attacked_by": str(cell.last_attacked_by),
                     "will_move": cell.will_move,
-                    "new_pos": self._convert_to_serializable(cell.new_pos),
+                    "new_pos": self.convert_to_serializable(cell.new_pos),
                     "has_any_bridge": cell.has_any_bridge,
                     "ghost_bridges": []
                 }
@@ -134,7 +134,7 @@ class SaveSystemJSON:
                     # Save units on the bridge
                     for unit in bridge.units:
                         unit_data = {
-                            "position": self._convert_to_serializable(unit.position),
+                            "position": self.convert_to_serializable(unit.position),
                             "radius": float(unit.radius),
                             "dead": unit.dead,
                             "color": [unit.color[0], unit.color[1], unit.color[2]]
@@ -175,7 +175,7 @@ class SaveSystemJSON:
 
             # Write data to file as JSON
             with open(self.save_path, 'w', encoding='utf-8') as f:
-                json.dump(self._convert_to_serializable(game_data), f, ensure_ascii=False, indent=4)
+                json.dump(self.convert_to_serializable(game_data), f, ensure_ascii=False, indent=4)
 
             print(f"Game saved successfully to {self.save_path}")
             return True

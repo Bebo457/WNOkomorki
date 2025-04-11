@@ -187,8 +187,15 @@ def handle_client(client_socket, address):
                     shared.client_message = message
                     shared.received_client_message = True
                     shared.level.online_active = True
+            elif message.startswith("GAME_STATE:"):
+                json_data = message[11:]
+                process_game_state(json_data)  # Dodaj funkcję jeśli chcesz
+            elif message.startswith("JSON:"):
+                typ, dane = parse_received_data(message)
+                if typ == 'json':
+                    print("Host otrzymał dane JSON:", dane)
             else:
-                print("Nieprawidłowy format wiadomości połączeniowej")
+                print(f"Zwykła wiadomość: {message}")
         else:
             print(f"Nieoczekiwany format pierwszej wiadomości: {message}")
 
@@ -211,10 +218,6 @@ def send_game_state_to_client():
             print("Brak dostępu do obiektu poziomu lub systemu zapisu")
             return
 
-        # Inicjalizacja podstawowego stanu gry, jeśli jest to pierwszy setup
-        if shared.game_state == 'online_setup' and len(shared.level.cells) == 0:
-            shared.level.set_level_1()  # Inicjalizacja podstawowego poziomu
-
         # Pobierz stan gry jako słownik
         game_data = shared.level.save_system_json.save_game(return_data=True)
         if not game_data:
@@ -222,7 +225,7 @@ def send_game_state_to_client():
             return
 
         # Konwertuj na JSON
-        json_data = json.dumps(shared.level.save_system_json._convert_to_serializable(game_data))
+        json_data = json.dumps(shared.level.save_system_json.convert_to_serializable(game_data))
 
         # Dodaj prefix do identyfikacji typu wiadomości
         full_message = f"GAME_STATE:{json_data}"
