@@ -15,7 +15,8 @@ def host_game():
 
 def connect_to_game():
     print(f"Łączenie z hostem: {shared.host_ip}")
-    client_socket = connect_to_server(shared.host_ip, shared.port)
+    connection_message = f"CONNECT:{shared.ip_address}:{shared.port}"
+    client_socket = connect_to_server(shared.host_ip, shared.port, connection_message)
 
     if client_socket:
         # Zapisz referencję do socketu
