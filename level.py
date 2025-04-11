@@ -1033,7 +1033,107 @@ class Level:
         # obiekt klasy AI
         self.AI = SimpleAI(self, 'RED')
 
+    def online_loop_setup(self):
+        """
+        Funkcja analogiczna do pvp_loop_setup dla trybu online
+        Obsługuje fazę stawiania komórek w trybie online
+        """
+        click = shared.click
+        LMB = shared.LMB
+        RMB = shared.RMB
+        mouse_pos = shared.mouse_pos
+        window = shared.window
 
+        # DZIAŁANIE GRY - analogiczne do pvp_loop_setup
+        if self.placing_cell is not None:
+            # Dla gracza niebieskiego
+            if click and self.active_player == 0 and self.players[self.active_player].coins >= 20:
+                # Sprawdzanie czy punkt jest w dozwolonej strefie
+                if is_point_inside_area(mouse_pos, (shared.cell_radius, shared.cell_radius),
+                                        (self.game_area_width / 3 - shared.cell_radius,
+                                         self.game_area_height - shared.cell_radius)):
+                    cell = Cell("BASIC", 10, 1, self.players[self.active_player].color,
+                                np.array([mouse_pos[0], mouse_pos[1]]))
+                    self.addCell(cell)
+                    self.players[0].coins -= 20
+            # Dla gracza czerwonego
+            elif click and self.active_player == 1 and self.players[self.active_player].coins >= 20:
+                # Sprawdzanie czy punkt jest w dozwolonej strefie
+                if is_point_inside_area(mouse_pos,
+                                        (shared.cell_radius + 2 / 3 * self.game_area_width, shared.cell_radius),
+                                        (self.game_area_width - shared.cell_radius,
+                                         self.game_area_height - shared.cell_radius)):
+                    cell = Cell("BASIC", 10, 1, self.players[self.active_player].color,
+                                np.array([mouse_pos[0], mouse_pos[1]]))
+                    self.addCell(cell)
+                    self.players[1].coins -= 20
+            # Anulowanie wyboru komórki
+            if RMB:
+                self.placing_cell = None
+
+        # RYSOWANIE - analogiczne do pvp_loop_setup
+        # Tworzenie powierzchni dla pola walki
+        battle_texture = pygame.transform.scale(shared.purple_texture, (self.game_area_width, self.game_area_height))
+        self.battle_area_surface.blit(battle_texture, (0, 0))
+
+        # Rysowanie menu timera
+        shared.timer_menu.draw(window)
+        shared.timer_menu.update(shared.events)
+
+        # Rysowanie odpowiedniego menu
+        if self.is_shop_open:
+            self.shop_menu.draw(window)
+            self.shop_menu.update(shared.events)
+        elif shared.game_state == 'online_setup':
+            shared.pvp_menu.draw(window)
+            shared.pvp_menu.update(shared.events)
+
+        # Rysowanie stref stawiania komórek
+        # STREFA NIEBIESKA
+        transparent_surface = pygame.Surface((self.start_zones_width, self.start_zones_height), pygame.SRCALPHA)
+        pygame.draw.rect(transparent_surface, (0, 0, 255, 128), (0, 0, self.start_zones_width, self.start_zones_height))
+        self.battle_area_surface.blit(transparent_surface, (0, 0))
+
+        # STREFA CZERWONA
+        transparent_surface_red = pygame.Surface((self.start_zones_width, self.start_zones_height), pygame.SRCALPHA)
+        pygame.draw.rect(transparent_surface_red, (255, 0, 0, 128),
+                         (0, 0, self.start_zones_width, self.start_zones_height))
+        self.battle_area_surface.blit(transparent_surface_red, (2 / 3 * self.game_area_width, 0))
+
+        # Rysowanie cienia komórki przy stawianiu
+        if self.placing_cell is not None:
+            pygame.draw.circle(self.battle_area_surface, shared.GRAY_TRANSPARENT, mouse_pos, shared.cell_radius)
+
+        # Rysowanie timerów
+        self.draw_timers()
+
+        # Rysowanie informacji o graczu i monetach
+        font = pygame.font.Font(None, 40)
+        if self.active_player == 0:
+            label = f"Niebieski: {self.players[0].coins}"
+            text_surface = font.render(label, True, shared.BLUE)
+        else:
+            label = f"Czerwony: {self.players[1].coins}"
+            text_surface = font.render(label, True, shared.RED)
+
+        text_x = self.game_area_width + (self.side_menu_width // 2 - text_surface.get_width() // 2)
+        text_y = 0.65 * self.game_area_height
+        shared.window.blit(text_surface, (text_x, text_y))
+
+        # Rysowanie ikony monety
+        coin_size = shared.coin_size
+        coin_texture = pygame.transform.scale(shared.coin_texture, (coin_size, coin_size))
+        coin_x = self.game_area_width + (
+                    self.side_menu_width // 2 - text_surface.get_width() // 2) + text_surface.get_width() + 10
+        coin_y = 0.65 * self.game_area_height - shared.coin_y_offset
+        shared.window.blit(coin_texture, (coin_x, coin_y))
+
+        # Rysowanie pola walki
+        shared.window.blit(self.battle_area_surface, (0, 0))
+
+        # Rysowanie komórek
+        for cell in self.cells:
+            cell.draw(shared.window, shared.font)
 
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):
@@ -1128,366 +1228,4 @@ def draw_game_over_message(screen, winner_name, color):
     screen.blit(text_surface, text_rect)  # Rysowanie tekstu na ekranie
 
 
-    # LOOP TRYBU PVP
-    def online_loop_setup(self):
-        click = shared.click
-        LMB = shared.LMB
-        RMB = shared.RMB
-        mouse_pos = shared.mouse_pos
-        window = shared.window
 
-        # DZIAŁANIE GRY
-
-        if self.placing_cell is not None:
-            if click and self.active_player == 0 and self.players[self.active_player].coins >= 20 and is_point_inside_area(mouse_pos, (shared.cell_radius, shared.cell_radius), (self.game_area_width/3 - shared.cell_radius, self.game_area_height - shared.cell_radius)):
-                cell = Cell("BASIC", 10, 1, self.players[self.active_player].color, np.array([mouse_pos[0], mouse_pos[1]]))
-                self.addCell(cell)
-                self.players[0].coins -= 20
-            elif click and self.active_player == 1 and self.players[self.active_player].coins >= 20 and is_point_inside_area(mouse_pos, (shared.cell_radius + 2/3 * self.game_area_width, shared.cell_radius), (self.game_area_width - shared.cell_radius, self.game_area_height - shared.cell_radius)):
-                cell = Cell("BASIC", 10, 1, self.players[self.active_player].color, np.array([mouse_pos[0], mouse_pos[1]]))
-                self.addCell(cell)
-                self.players[1].coins -= 20
-            if RMB:
-                self.placing_cell = None
-
-        # RYSOWANIE
-
-        # Tworzenie powierzchni dla pola walki
-
-        # Rysowanie paska bocznego (menu)
-        battle_texture = pygame.transform.scale(shared.purple_texture, (self.game_area_width, self.game_area_height))
-        self.battle_area_surface.blit(battle_texture, (0, 0))
-
-        shared.timer_menu.draw(window)
-        shared.timer_menu.update(shared.events)
-        if self.is_shop_open:
-            self.shop_menu.draw(window)
-            self.shop_menu.update(shared.events)
-        elif shared.game_state == 'pvp_setup':
-            shared.pvp_menu.draw(window)
-            shared.pvp_menu.update(shared.events)
-
-        # Rysowanie przeźroczystych stref stawiania komórek na powierzchni bitwy
-        # STREFA NIEBIESKA
-        transparent_surface = pygame.Surface((self.start_zones_width, self.start_zones_height),pygame.SRCALPHA)
-        pygame.draw.rect(transparent_surface, (0, 0, 255, 128),(0, 0, self.start_zones_width, self.start_zones_height))
-        self.battle_area_surface.blit(transparent_surface, (0, 0))
-
-        # STREFA CZERWONA
-        transparent_surface_red = pygame.Surface((self.start_zones_width, self.start_zones_height), pygame.SRCALPHA)
-        pygame.draw.rect(transparent_surface_red, (255, 0, 0, 128),(0, 0, self.start_zones_width, self.start_zones_height))
-        self.battle_area_surface.blit(transparent_surface_red, (2 / 3 * self.game_area_width, 0))
-
-        # kiedy stawiana będzie komórka rysowanie jej cienia
-        if self.placing_cell is not None:
-            pygame.draw.circle(self.battle_area_surface, shared.GRAY_TRANSPARENT, mouse_pos, shared.cell_radius)
-
-        # Rysowanie timerów
-        self.draw_timers()
-
-        # Rysowanie napisu "Monety" na dole menu bocznego
-        font = pygame.font.Font(None, 40)  # Czcionka (rozmiar 40)
-        if self.active_player == 0:
-            label = f"Niebieski: {self.players[0].coins}"
-            text_surface = font.render(label, True, shared.BLUE)
-        else:
-            label = f"Czerwony: {self.players[1].coins}"
-            text_surface = font.render(label, True, shared.RED)
-
-        text_x = self.game_area_width + (self.side_menu_width // 2 - text_surface.get_width() // 2)  # Wycentrowanie na bocznym menu
-        text_y = 0.65 * self.game_area_height  # Pozycja na dole menu bocznego
-        shared.window.blit(text_surface, (text_x, text_y))  # Wyświetlenie napisu na ekranie
-
-        # Rysowanie obrazka z teksturą "coin_texture"
-        coin_size = shared.coin_size
-        coin_texture = pygame.transform.scale(shared.coin_texture, (coin_size, coin_size))  # Skalowanie tekstury monety
-        coin_x = self.game_area_width + (self.side_menu_width // 2 - text_surface.get_width() // 2) + text_surface.get_width() + 10  # Obok napisu
-        coin_y = 0.65 * self.game_area_height - shared.coin_y_offset # Pozycja równoległa do napisu "Monety"
-        shared.window.blit(coin_texture, (coin_x, coin_y))  # Wyświetlenie monety obok napisu
-
-        # rysowanie powierzchni pola walki
-        shared.window.blit(self.battle_area_surface, (0, 0))
-
-        for cell in self.cells:
-            cell.draw(shared.window, shared.font)
-
-    def online_loop(self):
-        click = shared.click
-        LMB = shared.LMB
-        RMB = shared.RMB
-        mouse_pos = shared.mouse_pos
-        window = shared.window
-
-        # DZIAŁANIE
-        # zmienna potrzebna do wykrywania przecinania
-        any_cell_hovered = False
-        # obsługa kliknięć myszką
-        if shared.game_state == 'pvp_turn':
-            # aktualizacja zegara
-            self.pvp_check_for_win()
-            self.players[self.active_player].timer -= shared.mnoznik
-            # Przetwarzanie systemu gestów
-            if self.gest_sys_on:
-                # Pobieranie klatki obrazu z kamery
-                ret, frame = shared.cap.read()
-                if not ret:
-                    print("Nie udało się odczytać klatki.")
-                # Przetwarzanie klatki
-                self.gest_sys.process_frame(frame)
-                # Pobieranie danych gestów
-                palm_x, palm_y = self.gest_sys.get_palm_coordinates_percentage(frame.shape[1], frame.shape[0])
-                is_fist = self.gest_sys.get_fist_status()
-
-            for cell in self.cells:
-                # potrzebne do wykrycia połączeń
-                cell.has_any_bridge = False
-                cell.check_capture()
-                if cell.is_hovered(mouse_pos):
-                    any_cell_hovered = True
-                if cell.activated_connection:
-                    draw_dashed_line(window, cell.color, (cell.position[0], cell.position[1]), mouse_pos, 10, 3)
-                if cell.is_clicked_lmb(LMB) and not self.activated_cell_connection and not self.lock and self.players[
-                    self.active_player].color == cell.color and not cell.will_move:
-                    cell.activated_connection = True
-                    self.activated_cell_connection = True
-                    self.clicked_cell_id = cell.id
-                # zaznaczenie mostu do zbudowania
-                if self.activated_cell_connection and cell.is_hovered(
-                        mouse_pos) and LMB and not self.clicked_cell_id == cell.id and not cell.will_move:
-                    # sprawdzanie czy nie ma już tam mostu
-                    check = True
-                    for bridge in self.cells[self.clicked_cell_id].bridges:
-                        if bridge.parent == self.cells[self.clicked_cell_id] and bridge.destination == cell:
-                            check = False
-                    if check:
-                        ghost_bridge = (self.cells[self.clicked_cell_id], cell)
-                        self.cells[self.clicked_cell_id].ghost_bridges.append(ghost_bridge)
-                        self.cells[self.clicked_cell_id].activated_connection = False
-                        self.clicked_cell_id = -1
-                        self.activated_cell_connection = False
-                        self.lock = True
-                if self.activated_cell_connection and RMB:
-                    self.cells[self.clicked_cell_id].activated_connection = False
-                    self.clicked_cell_id = -1
-                    self.activated_cell_connection = False
-                if self.lock:
-                    self.lock = False
-                    for cell1 in self.cells:
-                        if cell1.is_hovered(mouse_pos):
-                            self.lock = True
-                # wykrywanie PPM na komórkę do otwierania menu kontekstowego
-                if RMB and not self.activated_cell_connection and not self.cutting and cell.is_hovered(
-                        shared.mouse_pos) and cell.color == self.players[self.active_player].color:
-                    self.context_on = True
-                    self.pvp_main_menu.disable()
-                    for cell2 in self.cells:
-                        cell2.context_menu.disable()
-                    cell.context_menu.enable()
-                elif RMB and self.context_on and not any_cell_hovered:
-                    self.context_on = False
-                    self.pvp_main_menu.enable()
-                    cell.context_menu.disable()
-            # pętla do sprawdzania czy ma jakiekolwiek połączenia (do ruszania)
-            for cell in self.cells:
-                for bridge in cell.bridges:
-                    bridge.parent.has_any_bridge = True
-                    bridge.destination.has_any_bridge = True
-                for ghost in cell.ghost_bridges:
-                    ghost[0].has_any_bridge = True
-                    ghost[1].has_any_bridge = True
-
-            # GESTY
-            if self.gest_sys_on:
-                ret, frame = shared.cap.read()
-                x, y = self.gest_sys.get_palm_coordinates_percentage(frame.shape[1], frame.shape[0])
-                self.fist = self.gest_sys.get_fist_status()
-                x = x / 100
-                y = y / 100
-                x = 1 - x
-                x = x * self.game_area_width
-                y = y * self.game_area_height
-                self.x_cam = x
-                self.y_cam = y
-            if self.gest_sys_on:
-                # szuka najbliższej komórki
-                for cell in self.cells:
-                    dist = np.linalg.norm(np.array([self.x_cam, self.y_cam]) - cell.position)
-                    if dist < cell.radius and cell.color == self.players[self.active_player].color:
-                        self.cam_curs_cell = cell
-                        self.cam_curs_cell.will_move = True
-                if self.fist and self.cam_curs_cell is not None:
-                    if np.linalg.norm(np.array([self.x_cam,
-                                                self.y_cam]) - self.cam_curs_cell.position) <= shared.move_const * self.cam_curs_cell.radius:
-                        self.cam_curs_cell.new_pos = np.array([self.x_cam, self.y_cam])
-                    else:
-                        kursor = np.array([self.x_cam, self.y_cam])
-                        versor = (kursor - self.cam_curs_cell.position) / np.linalg.norm(
-                            kursor - self.cam_curs_cell.position)
-                        wektor = versor * (shared.move_const * self.cam_curs_cell.radius)
-                        self.cam_curs_cell.new_pos = self.cam_curs_cell.position + wektor
-
-            # PRZECINANIE
-            if self.cutting and click:
-                self.cutting = False
-                for cell in self.cells:
-                    if cell.color == self.players[self.active_player].color:
-                        for bridge in cell.bridges:
-                            intersect, int_point = line_intersection(self.cutting_start_pos, mouse_pos,
-                                                                     bridge.real_start, bridge.real_end)
-                            if intersect:
-                                int_pos = np.array([int_point[0], int_point[1]])
-                                bridge.can_spawn_this_turn = False
-                                if bridge.finished:
-                                    if not bridge.is_half_bridge:
-                                        # odległość procentowa względem długości całego mostu od rodzica
-                                        cutting_len = np.linalg.norm(int_pos - bridge.real_start)
-                                        cut_bridge_ratio = cutting_len / bridge.len
-                                        bridge.create_cut(cut_bridge_ratio)
-                                    else:
-                                        bridge.collapse = True
-                                else:
-                                    bridge.collapse = True
-                    cell.ghost_bridges = [
-                        ghost_bridge for ghost_bridge in cell.ghost_bridges
-                        if not
-                        line_intersection(self.cutting_start_pos, mouse_pos,
-                                          (ghost_bridge[0].position[0], ghost_bridge[0].position[1]),
-                                          (ghost_bridge[1].position[0], ghost_bridge[1].position[1]))[0]]
-
-
-            elif not any_cell_hovered and not self.activated_cell_connection and click and is_point_inside_area(
-                    mouse_pos, (0, 0), (self.game_area_width, self.game_area_height)):
-                self.cutting = True
-                self.cutting_start_pos = mouse_pos
-
-            if self.cutting and RMB:
-                self.cutting = False
-
-            for cell in self.cells:
-                # obsługa ruszania
-                if cell.will_move and cell.context_menu.is_enabled():
-                    if np.linalg.norm(np.array(
-                            [mouse_pos[0], mouse_pos[1]]) - cell.position) <= cell.radius * shared.move_const and click:
-                        self.cutting = False
-                        cell.new_pos = np.array([mouse_pos[0], mouse_pos[1]])
-
-        elif shared.game_state == 'pvp_wait':
-            can_skip = True
-            for cell in self.cells:
-                cell.check_bridges_to_delete()
-                cell.update_tier()
-                cell.change_position()
-                if cell.will_move:
-                    can_skip = False
-                for bridge in cell.bridges:
-                    if bridge.pvp_units > 0:
-                        can_skip = False
-                    if bridge.can_spawn_this_turn:
-                        bridge.action_pvp()
-                    bridge.check_collapse()
-                    bridge.building_bridge()
-                    bridge.detect_half_bridge()
-                    bridge.filter_dead_units()
-                    if not bridge.finished or len(bridge.units) > 0:
-                        can_skip = False
-                    for unit in bridge.units:
-                        unit.update_position()
-            if can_skip:
-                self.give_turn()
-
-        # RYSOWANIE
-
-        # Rysowanie paska bocznego (menu)
-        battle_texture = pygame.transform.scale(shared.purple_texture, (self.game_area_width, self.game_area_height))
-        self.battle_area_surface.blit(battle_texture, (0, 0))
-
-        shared.timer_menu.draw(window)
-        shared.timer_menu.update(shared.events)
-
-        if shared.game_state != 'pvp_wait':
-            if self.pvp_main_menu.is_enabled():
-                self.pvp_main_menu.draw(window)
-                self.pvp_main_menu.update(shared.events)
-            elif self.context_on:
-                for cell in self.cells:
-                    if cell.context_menu.is_enabled():
-                        cell.update_context_menu()
-                        cell.context_menu.draw(shared.window)
-                        cell.context_menu.update(shared.events)
-
-        # Rysowanie timerów
-        self.draw_timers()
-        font = pygame.font.Font(None, 40)  # Czcionka (rozmiar 40)
-        if self.active_player == 0:
-            label = "Niebieski"
-            text_surface = font.render(label, True, shared.BLUE)
-        else:
-            label = "Czerwony"
-            text_surface = font.render(label, True, shared.RED)
-        text_x = self.game_area_width + (
-                    self.side_menu_width // 2 - text_surface.get_width() // 2)  # Wycentrowanie na bocznym menu
-        text_y = 0.65 * self.game_area_height  # Pozycja na dole menu bocznego
-        shared.window.blit(text_surface, (text_x, text_y))  # Wyświetlenie napisu na ekranie
-
-        # rysowanie linii cięcia
-        if self.cutting:
-            pygame.draw.line(self.battle_area_surface, WHITE, self.cutting_start_pos, mouse_pos, line_width)
-
-        # rysowanie powierzchni pola walki
-        shared.window.blit(self.battle_area_surface, (0, 0))
-
-        # rysowanie linii do łączenia komórek
-        for cell in self.cells:
-            if cell.activated_connection:
-                draw_dashed_line(window, cell.color, (cell.position[0], cell.position[1]), mouse_pos, 10, 3)
-
-            # obsługa rysowania rzeczy do przesuwania
-            if cell.will_move and cell.context_menu.is_enabled():
-                pygame.draw.circle(shared.window, shared.GRAY, cell.position, cell.radius * shared.move_const)
-            if not (cell.position[0] == cell.new_pos[0] and cell.position[1] == cell.new_pos[1]):
-                pygame.draw.line(shared.window, shared.BLACK, cell.position, cell.new_pos, shared.line_width)
-
-        # rysowanie mostów, komórek i jednostek
-        for cell in self.cells:
-            for bridge in cell.bridges:
-                if bridge.collapse and shared.game_state == 'pvp_turn':
-                    if self.active_player == 0:
-                        bridge.draw_bridge(shared.window, shared.LIGHT_BLUE)
-                    else:
-                        bridge.draw_bridge(shared.window, shared.LIGHT_RED)
-                else:
-                    bridge.draw_bridge(shared.window)
-            for ghost_bridge in cell.ghost_bridges:
-                draw_dashed_line(shared.window, ghost_bridge[0].color, ghost_bridge[0].position,
-                                 ghost_bridge[1].position)
-            cell.draw(shared.window, shared.font)
-
-        for cell in self.cells:
-            for bridge in cell.bridges:
-                for unit in bridge.units:
-                    unit.draw_unit(shared.window)
-
-        # rysowanie okna zwycięzcy
-        if shared.game_state == 'pvp_end':
-            for player in self.players:
-                if not player.lost:
-                    if player.color == 'BLUE':
-                        winner = 'Niebieski'
-                        winner_color = player.color
-                    elif player.color == 'RED':
-                        winner = 'Czerwony'
-                        winner_color = player.color
-            draw_game_over_message(shared.window, winner, winner_color)
-            self.end_menu.draw(shared.window)
-            self.end_menu.update(shared.events)
-
-        # rysowanie kursora gestów
-        if self.gest_sys_on:
-            fist = self.gest_sys.get_fist_status()
-            if fist:
-                pygame.draw.circle(shared.window, shared.DARK_RED, (self.x_cam, self.y_cam), shared.gest_cursor_radius)
-            else:
-                pygame.draw.circle(shared.window, shared.GREEN, (self.x_cam, self.y_cam), shared.gest_cursor_radius)
-
-
-    # def waiting_for_player_loop(self):

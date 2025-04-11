@@ -4,6 +4,7 @@ import json
 
 import shared
 
+
 def host_game():
     print("Hostowanie gry...")
     shared.online_status_label.set_title("oczekiwanie na drugiego gracza...")
@@ -38,7 +39,7 @@ def connect_to_game():
             if response.startswith("ACCEPTED:"):
                 print("Połączenie zostało zaakceptowane przez hosta")
                 shared.active_connection = True
-                shared.game_state = 'online_game'
+                shared.game_state = 'online_setup'  # Zmieniono na online_setup zamiast online_game
 
                 if hasattr(shared, 'online_status_label'):
                     shared.online_status_label.set_title("połączono")
@@ -56,6 +57,7 @@ def connect_to_game():
             client_socket.close()
             shared.client_socket = None
 
+
 def send_message(message):
     if hasattr(shared, 'client_socket') and shared.client_socket:
         try:
@@ -67,16 +69,49 @@ def send_message(message):
 def receive_messages(client_socket):
     try:
         while True:
-            data = client_socket.recv(1024)
+            data = client_socket.recv(8192)  # Zwiększono bufor dla większych danych
             if not data:
                 break
+
             message = data.decode('utf-8')
-            print(f"Otrzymano: {message}")
-            # Tu możesz dodać obsługę otrzymanej wiadomości w grze
+
+            # Sprawdź początek wiadomości, aby określić jej typ
+            if message.startswith("GAME_STATE:"):
+                # Wyodrębnij dane JSON ze stanu gry
+                json_data = message[11:]  # Usuń prefix "GAME_STATE:"
+                print("Otrzymano stan gry od hosta")
+                process_game_state(json_data)
+            else:
+                print(f"Otrzymano: {message}")
+                # Zapisz wiadomość i ustaw flagę
+                shared.client_message = message
+                shared.received_client_message = True
     except Exception as e:
         print(f"Błąd: {e}")
     finally:
         client_socket.close()
+
+
+def process_game_state(json_data):
+    """Przetwórz otrzymany stan gry i załaduj do lokalnej instancji gry"""
+    try:
+        # Konwertuj string JSON na słownik Pythona
+        game_data = json.loads(json_data)
+
+        # Załaduj stan gry używając istniejącego systemu z save_system_json
+        if hasattr(shared, "level") and hasattr(shared.level, "save_system_json"):
+            success = shared.level.save_system_json.load_game_from_data(game_data)
+            if success:
+                print("Stan gry załadowany pomyślnie")
+                shared.game_state = 'online_setup'
+            else:
+                print("Nie udało się załadować stanu gry")
+        else:
+            print("Brak dostępu do obiektu poziomu lub systemu zapisu")
+    except json.JSONDecodeError as e:
+        print(f"Błąd podczas dekodowania danych JSON: {e}")
+    except Exception as e:
+        print(f"Błąd podczas przetwarzania stanu gry: {e}")
 
 
 def connect_to_server(host, port, message):
@@ -106,19 +141,55 @@ def handle_client(client_socket, address):
     shared.client_socket = client_socket  # Zapisz socket klienta do późniejszego użycia
 
     try:
-        while True:
-            data = client_socket.recv(1024)
-            if not data:
-                break
+        # Odbierz pierwszą wiadomość od klienta
+        data = client_socket.recv(1024)
+        if not data:
+            return
 
-            message = data.decode('utf-8')
-            print(f"Otrzymano: {message}")
+        message = data.decode('utf-8')
+        print(f"Otrzymano pierwszą wiadomość: {message}")
 
-            # Zapisz wiadomość i ustaw flagę
-            shared.client_message = message
-            shared.received_client_message = True
+        # Sprawdź, czy jest to wiadomość połączeniowa
+        if message.startswith("CONNECT:"):
+            parts = message[8:].split(':')
+            if len(parts) == 2:
+                client_ip = parts[0]
+                client_port = parts[1]
 
-            # Tutaj możesz dodać obsługę różnych typów wiadomości
+                # Akceptuj połączenie
+                response = "ACCEPTED:CONNECTION_ESTABLISHED"
+                client_socket.send(response.encode('utf-8'))
+                print(f"Zaakceptowano połączenie od {client_ip}:{client_port}")
+
+                # Ustaw zmienne
+                shared.client_ip = client_ip
+                shared.client_port = int(client_port)
+                shared.active_connection = True
+                shared.game_state = 'online_setup'  # Zmieniono na online_setup zamiast online_game
+
+                # Aktualizuj status
+                if hasattr(shared, 'online_status_label'):
+                    shared.online_status_label.set_title("połączono")
+
+                # Wyślij stan gry do klienta
+                send_game_state_to_client()
+
+                # Kontynuuj odbieranie wiadomości
+                while True:
+                    data = client_socket.recv(4096)
+                    if not data:
+                        break
+
+                    message = data.decode('utf-8')
+                    print(f"Otrzymano: {message}")
+
+                    # Zapisz wiadomość i ustaw flagę
+                    shared.client_message = message
+                    shared.received_client_message = True
+            else:
+                print("Nieprawidłowy format wiadomości połączeniowej")
+        else:
+            print(f"Nieoczekiwany format pierwszej wiadomości: {message}")
 
     except Exception as e:
         print(f"Błąd podczas obsługi klienta: {e}")
@@ -130,6 +201,38 @@ def handle_client(client_socket, address):
         shared.client_socket = None
         if hasattr(shared, 'online_status_label'):
             shared.online_status_label.set_title("rozłączono")
+
+
+def send_game_state_to_client():
+    """Wysyła aktualny stan gry do klienta"""
+    try:
+        if not hasattr(shared, "level") or not hasattr(shared.level, "save_system_json"):
+            print("Brak dostępu do obiektu poziomu lub systemu zapisu")
+            return
+
+        # Inicjalizacja podstawowego stanu gry, jeśli jest to pierwszy setup
+        if shared.game_state == 'online_setup' and len(shared.level.cells) == 0:
+            shared.level.set_level_1()  # Inicjalizacja podstawowego poziomu
+
+        # Pobierz stan gry jako słownik
+        game_data = shared.level.save_system_json.save_game(return_data=True)
+        if not game_data:
+            print("Nie udało się uzyskać danych gry")
+            return
+
+        # Konwertuj na JSON
+        json_data = json.dumps(shared.level.save_system_json._convert_to_serializable(game_data))
+
+        # Dodaj prefix do identyfikacji typu wiadomości
+        full_message = f"GAME_STATE:{json_data}"
+
+        if shared.client_socket:
+            shared.client_socket.send(full_message.encode('utf-8'))
+            print("Stan gry wysłany do klienta")
+        else:
+            print("Brak podłączonego klienta")
+    except Exception as e:
+        print(f"Błąd podczas wysyłania stanu gry: {e}")
 
 
 def start_server(host, port):
@@ -148,6 +251,10 @@ def start_server(host, port):
         print("Serwer zatrzymany")
     finally:
         server.close()
+
+
+# Ta funkcja została przeniesiona do klasy Level w pliku level.py
+# i powinna być wywoływana jako level.online_loop_setup()
 
 
 def send_variables(variables_dict):
@@ -203,56 +310,6 @@ def parse_received_data(data):
         return ('message', data)
 
 
-def handle_received_variables(variables):
-    """
-    Obsługuje odebrane zmienne - możesz dostosować tę funkcję
-    do potrzeb swojej gry.
-
-    Args:
-        variables (dict): Słownik z odebranymi zmiennymi
-    """
-    # Przykład: jeśli otrzymano informacje o pozycji gracza, zaktualizuj ją
-    if 'player_position' in variables:
-        print(f"Aktualizacja pozycji gracza: {variables['player_position']}")
-        # shared.remote_player_position = variables['player_position']
-
-    # Przykład: jeśli otrzymano informacje o komórkach
-    if 'cells' in variables:
-        print(f"Otrzymano dane o {len(variables['cells'])} komórkach")
-        # Tu możesz dodać kod do aktualizacji stanu komórek w grze
-
-    # Możesz dodać więcej warunków dla różnych typów danych
-
-
-def validate_ip_address(ip):
-    """
-    Sprawdza czy podany ciąg znaków jest poprawnym adresem IPv4.
-
-    Args:
-        ip (str): Adres IP do sprawdzenia
-
-    Returns:
-        bool: True jeśli adres jest poprawny, False w przeciwnym razie
-    """
-    try:
-        # Sprawdź czy adres IP ma 4 części
-        parts = ip.split('.')
-        if len(parts) != 4:
-            return False
-
-        # Sprawdź czy każda część jest liczbą z zakresu 0-255
-        for part in parts:
-            if not part.isdigit():
-                return False
-            num = int(part)
-            if num < 0 or num > 255:
-                return False
-
-        return True
-    except:
-        return False
-
-
 def handle_incoming_connection():
     """
     Sprawdza czy jest nowe połączenie od klienta i przetwarza je.
@@ -285,7 +342,7 @@ def handle_incoming_connection():
                             shared.active_connection = True
 
                             # Zmień stan gry
-                            shared.game_state = 'online_game'
+                            shared.game_state = 'online_setup'
 
                             # Wyślij potwierdzenie do klienta
                             if hasattr(shared, 'client_socket') and shared.client_socket:
@@ -318,3 +375,34 @@ def handle_incoming_connection():
 
         # Zresetuj flagę otrzymanej wiadomości
         shared.received_client_message = False
+
+
+def validate_ip_address(ip):
+    """
+    Sprawdza czy podany ciąg znaków jest poprawnym adresem IPv4.
+
+    Args:
+        ip (str): Adres IP do sprawdzenia
+
+    Returns:
+        bool: True jeśli adres jest poprawny, False w przeciwnym razie
+    """
+    try:
+        # Sprawdź czy adres IP ma 4 części
+        parts = ip.split('.')
+        if len(parts) != 4:
+            return False
+
+        # Sprawdź czy każda część jest liczbą z zakresu 0-255
+        for part in parts:
+            if not part.isdigit():
+                return False
+            num = int(part)
+            if num < 0 or num > 255:
+                return False
+
+        return True
+    except:
+        return False
+
+# Ta funkcja już istnieje w level.py i powinna być używana stamtąd
