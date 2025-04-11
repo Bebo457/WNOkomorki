@@ -128,6 +128,9 @@ class Level:
         self.playback_active = False
         self.advance_to_next_frame = False
 
+        # obsługa pvp
+        self.online_active = False
+
 
     def stop_playback(self):
         """Zatrzymuje odtwarzanie nagrania i wraca do menu głównego"""
@@ -1038,38 +1041,39 @@ class Level:
         Funkcja analogiczna do pvp_loop_setup dla trybu online
         Obsługuje fazę stawiania komórek w trybie online
         """
+        print("wlazłem")
         click = shared.click
         LMB = shared.LMB
         RMB = shared.RMB
         mouse_pos = shared.mouse_pos
         window = shared.window
-
-        # DZIAŁANIE GRY - analogiczne do pvp_loop_setup
-        if self.placing_cell is not None:
-            # Dla gracza niebieskiego
-            if click and self.active_player == 0 and self.players[self.active_player].coins >= 20:
-                # Sprawdzanie czy punkt jest w dozwolonej strefie
-                if is_point_inside_area(mouse_pos, (shared.cell_radius, shared.cell_radius),
-                                        (self.game_area_width / 3 - shared.cell_radius,
-                                         self.game_area_height - shared.cell_radius)):
-                    cell = Cell("BASIC", 10, 1, self.players[self.active_player].color,
-                                np.array([mouse_pos[0], mouse_pos[1]]))
-                    self.addCell(cell)
-                    self.players[0].coins -= 20
-            # Dla gracza czerwonego
-            elif click and self.active_player == 1 and self.players[self.active_player].coins >= 20:
-                # Sprawdzanie czy punkt jest w dozwolonej strefie
-                if is_point_inside_area(mouse_pos,
-                                        (shared.cell_radius + 2 / 3 * self.game_area_width, shared.cell_radius),
-                                        (self.game_area_width - shared.cell_radius,
-                                         self.game_area_height - shared.cell_radius)):
-                    cell = Cell("BASIC", 10, 1, self.players[self.active_player].color,
-                                np.array([mouse_pos[0], mouse_pos[1]]))
-                    self.addCell(cell)
-                    self.players[1].coins -= 20
-            # Anulowanie wyboru komórki
-            if RMB:
-                self.placing_cell = None
+        if self.online_active:
+            # DZIAŁANIE GRY - analogiczne do pvp_loop_setup
+            if self.placing_cell is not None:
+                # Dla gracza niebieskiego
+                if click and self.active_player == 0 and self.players[self.active_player].coins >= 20:
+                    # Sprawdzanie czy punkt jest w dozwolonej strefie
+                    if is_point_inside_area(mouse_pos, (shared.cell_radius, shared.cell_radius),
+                                            (self.game_area_width / 3 - shared.cell_radius,
+                                             self.game_area_height - shared.cell_radius)):
+                        cell = Cell("BASIC", 10, 1, self.players[self.active_player].color,
+                                    np.array([mouse_pos[0], mouse_pos[1]]))
+                        self.addCell(cell)
+                        self.players[0].coins -= 20
+                # Dla gracza czerwonego
+                elif click and self.active_player == 1 and self.players[self.active_player].coins >= 20:
+                    # Sprawdzanie czy punkt jest w dozwolonej strefie
+                    if is_point_inside_area(mouse_pos,
+                                            (shared.cell_radius + 2 / 3 * self.game_area_width, shared.cell_radius),
+                                            (self.game_area_width - shared.cell_radius,
+                                             self.game_area_height - shared.cell_radius)):
+                        cell = Cell("BASIC", 10, 1, self.players[self.active_player].color,
+                                    np.array([mouse_pos[0], mouse_pos[1]]))
+                        self.addCell(cell)
+                        self.players[1].coins -= 20
+                # Anulowanie wyboru komórki
+                if RMB:
+                    self.placing_cell = None
 
         # RYSOWANIE - analogiczne do pvp_loop_setup
         # Tworzenie powierzchni dla pola walki

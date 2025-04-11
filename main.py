@@ -398,7 +398,7 @@ while True:
         level.pvp_loop()
     elif shared.game_state == 'ip_menu':
         ip_menu_loop()
-    elif shared.game_state == 'online_game':
+    elif shared.game_state == 'online_setup':
         level.online_loop_setup()
     elif shared.game_state == 'recordings_menu':
         recordings_menu_loop()

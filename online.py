@@ -186,6 +186,7 @@ def handle_client(client_socket, address):
                     # Zapisz wiadomość i ustaw flagę
                     shared.client_message = message
                     shared.received_client_message = True
+                    shared.level.online_active = True
             else:
                 print("Nieprawidłowy format wiadomości połączeniowej")
         else:
