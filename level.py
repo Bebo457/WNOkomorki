@@ -10,7 +10,7 @@ from hand2 import HandGestureSystem
 import cv2
 from decision import SimpleAI
 from save_system_xml import SaveSystemXML
-from save_system_firebase import SaveSystemFirebase
+# from save_system_firebase import SaveSystemFirebase
 from save_system_json import SaveSystemJSON
 from game_playback import GamePlayback
 
@@ -115,7 +115,7 @@ class Level:
 
         # inicjalizacja save system
         self.save_system_xml = SaveSystemXML(self)
-        self.save_system_firebase = SaveSystemFirebase(self)
+        # self.save_system_firebase = SaveSystemFirebase(self)
         self.save_system_json = SaveSystemJSON(self)
         self.playback = GamePlayback(self)
 
@@ -155,12 +155,14 @@ class Level:
         return self.save_system_json.load_game()
 
     def save_game_firebase(self):
+        pass
         """Save the current game state to Firebase"""
-        return self.save_system_firebase.save_game()
+        # return self.save_system_firebase.save_game()
 
     def load_game_firebase(self):
+        pass
         """Load a game state from Firebase"""
-        return self.save_system_firebase.load_game()
+        # return self.save_system_firebase.load_game()
 
     def save_game_xml(self):
         """Save the current game state to an XML file"""
