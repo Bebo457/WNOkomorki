@@ -1,8 +1,8 @@
 import pygame
 
 # Ustawienia okna
-width_px = None #1280
-height_px = None #720
+width_px = None
+height_px = None
 window_size = None
 window = None
 game_state = 'main_menu'
@@ -131,7 +131,7 @@ recordings_menu = None
 frame_speed = 1
 
 # Domyślny adres IP hosta, do którego klient będzie się łączył
-host_ip = "127.0.0.1"
+host_ip = "192.168.0.191"
 host_subnet_mask = "255.255.255.0"
 message_to_send = "Cześć!"
 client_socket = None

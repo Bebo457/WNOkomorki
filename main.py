@@ -10,7 +10,7 @@ import online
 pygame.init()
 
 # Ustawianie rozmiarów ekranu (najlepiej w stosunku 1280 x 720)
-shared.height_px = 936
+shared.height_px = 700
 shared.set_all_variables()
 window_size = (shared.width_px, shared.height_px)
 shared.window = pygame.display.set_mode(window_size, pygame.RESIZABLE)

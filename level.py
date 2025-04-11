@@ -1488,4 +1488,4 @@ def draw_game_over_message(screen, winner_name, color):
                 pygame.draw.circle(shared.window, shared.GREEN, (self.x_cam, self.y_cam), shared.gest_cursor_radius)
 
 
-    def waiting_for_player_loop(self):
+    # def waiting_for_player_loop(self):
