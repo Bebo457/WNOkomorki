@@ -1151,6 +1151,10 @@ class Level:
         shared.pvp_menu.add.button('Powrót', self.return_to_main_menu)
         if shared.game_state == 'online_setup' and shared.is_host:
             shared.timer_menu.enable()
+            shared.pvp_menu.enable()
+        elif shared.game_state == 'online_setup' and not shared.is_host:
+            shared.timer_menu.disable()
+            shared.pvp_menu.disable()
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):
     x1, y1 = start_pos
