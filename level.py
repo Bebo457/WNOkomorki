@@ -1088,7 +1088,7 @@ class Level:
         if self.is_shop_open:
             self.shop_menu.draw(window)
             self.shop_menu.update(shared.events)
-        elif shared.game_state == 'online_setup':
+        elif shared.game_state == 'online_setup' and shared.pvp_menu.is_enabled():
             shared.pvp_menu.draw(window)
             shared.pvp_menu.update(shared.events)
 
