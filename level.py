@@ -1080,8 +1080,9 @@ class Level:
         self.battle_area_surface.blit(battle_texture, (0, 0))
 
         # Rysowanie menu timera
-        shared.timer_menu.draw(window)
-        shared.timer_menu.update(shared.events)
+        if shared.timer_menu.is_enabled():
+            shared.timer_menu.draw(window)
+            shared.timer_menu.update(shared.events)
 
         # Rysowanie odpowiedniego menu
         if self.is_shop_open:
@@ -1148,7 +1149,8 @@ class Level:
         shared.pvp_menu.set_relative_position(100, 0)
         shared.pvp_menu.add.button('Sklep', self.activate_shop)
         shared.pvp_menu.add.button('Powrót', self.return_to_main_menu)
-        shared.timer_menu.enable()
+        if shared.game_state == 'online_setup' and shared.is_host:
+            shared.timer_menu.enable()
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):
     x1, y1 = start_pos
