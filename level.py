@@ -1125,7 +1125,7 @@ class Level:
             shared.level.online_active = False
             shared.pvp_menu.disable()
             shared.timer_menu.disable()
-        if shared.game_state == 'online_setup':
+        elif shared.game_state == 'online_setup':
             shared.game_state = 'online_setup'
             shared.level.pvp_side_menu_setup()
             self.online_active = True
