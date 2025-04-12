@@ -296,7 +296,7 @@ class Level:
         # obsługa kliknięć myszką
         if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
             # aktualizacja zegara
-            if shared.game_state == 'pvp_turn' or self.can_check_for_win:
+            if shared.game_state == 'pvp_turn' or self.can_check_for_win: #if shared.game_state == 'pvp_turn' or self.can_check_for_win:
                 self.pvp_check_for_win()
             self.players[self.active_player].timer -= shared.mnoznik
             # Przetwarzanie systemu gestów
@@ -1214,6 +1214,7 @@ class Level:
                 shared.timer_menu.disable()
         elif shared.game_state == 'online_pvp_turn':
             self.change_active_player()
+            self.can_check_for_win = False
             self.online_active = False
             for cell in self.cells:
                 cell.action_pvp()
@@ -1234,6 +1235,7 @@ class Level:
             else:
                 online.send_game_state_to_host()
         elif shared.game_state == 'online_pvp_wait':
+            self.can_check_for_win = False
             for cell in self.cells:
                 for bridge in cell.bridges:
                     bridge.update_can_spawn_this_turn()
