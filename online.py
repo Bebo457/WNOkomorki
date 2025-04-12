@@ -78,13 +78,10 @@ def receive_messages(client_socket):
 
             # Sprawdź początek wiadomości, aby określić jej typ
             if message.startswith("GAME_STATE:"):
-                # Wyodrębnij dane JSON ze stanu gry
-                json_data = message[11:]  # Usuń prefix "GAME_STATE:"
+                json_data = message[11:]
                 print("Otrzymano stan gry od hosta")
                 process_game_state(json_data)
-                shared.level.online_active = True
-                if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
-                    shared.level.online_active = False
+                shared.level.start_new_turn_online()
             else:
                 print(f"Otrzymano: {message}")
                 # Zapisz wiadomość i ustaw flagę
@@ -107,7 +104,6 @@ def process_game_state(json_data):
             success = shared.level.save_system_json.load_game_from_data(game_data)
             if success:
                 print("Stan gry załadowany pomyślnie")
-                shared.game_state = 'online_setup'
             else:
                 print("Nie udało się załadować stanu gry")
         else:
@@ -191,10 +187,11 @@ def handle_client(client_socket, address):
                     # Zapisz wiadomość i ustaw flagę
                     shared.client_message = message
                     shared.received_client_message = True
-                    shared.level.online_active = True
+                    shared.level.start_new_turn_online()
             elif message.startswith("GAME_STATE:"):
                 json_data = message[11:]
-                process_game_state(json_data)  # Dodaj funkcję jeśli chcesz
+                process_game_state(json_data)
+                shared.level.start_new_turn_online()
             elif message.startswith("JSON:"):
                 typ, dane = parse_received_data(message)
                 if typ == 'json':
