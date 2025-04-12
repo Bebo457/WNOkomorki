@@ -1141,13 +1141,9 @@ class Level:
             self.online_active = True
             self.pvp_main_menu.enable()
             shared.timer_menu.enable()
+        elif shared.game_state == 'online_pvp_wait':
+            self.online_active = True
 
-
-    def online_turn_loop(self):
-        pass
-
-    def online_pvp_wait_loop(self):
-        pass
 
     def give_turn(self):
         if shared.game_state == 'pvp_setup':
@@ -1216,7 +1212,6 @@ class Level:
         elif shared.game_state == 'online_pvp_turn':
             self.change_active_player()
             self.online_active = False
-            self.pvp_main_menu.enable()
             for cell in self.cells:
                 cell.action_pvp()
                 cell.context_menu.disable()
@@ -1236,6 +1231,13 @@ class Level:
             else:
                 online.send_game_state_to_host()
         elif shared.game_state == 'online_pvp_wait':
+            for cell in self.cells:
+                for bridge in cell.bridges:
+                    bridge.update_can_spawn_this_turn()
+            shared.game_state = 'online_pvp_turn'
+            self.change_active_player()
+            shared.pvp_menu.enable()
+            shared.timer_menu.enable()
             self.pvp_check_for_win()
 
 
