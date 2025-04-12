@@ -1192,6 +1192,14 @@ class Level:
                 self.pvp_main_menu.disable()
                 shared.timer_menu.disable()
 
+    # wywoływane po inicjalizowaniu połączenia po stronie klienta
+    def initialize_online_game(self):
+        if not shared.is_host:
+            shared.game_state = 'online_setup'
+            self.pvp_side_menu_setup()
+            shared.timer_menu.disable()
+            shared.pvp_menu.disable()
+
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):
     x1, y1 = start_pos
