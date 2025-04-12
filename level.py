@@ -1235,7 +1235,6 @@ class Level:
                 for bridge in cell.bridges:
                     bridge.update_can_spawn_this_turn()
             shared.game_state = 'online_pvp_turn'
-            self.change_active_player()
             shared.pvp_menu.enable()
             shared.timer_menu.enable()
             self.pvp_check_for_win()
