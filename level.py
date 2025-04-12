@@ -131,6 +131,8 @@ class Level:
 
         # obsługa pvp
         self.online_active = False
+        # dodatkowe zabezpieczenie do trybu online
+        self.can_check_for_win = False
 
 
     def stop_playback(self):
@@ -294,7 +296,7 @@ class Level:
         # obsługa kliknięć myszką
         if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
             # aktualizacja zegara
-            if shared.game_state == 'pvp_turn':
+            if shared.game_state == 'pvp_turn' or self.can_check_for_win:
                 self.pvp_check_for_win()
             self.players[self.active_player].timer -= shared.mnoznik
             # Przetwarzanie systemu gestów
@@ -1124,7 +1126,7 @@ class Level:
     # funkcja wywołana za każdym razem gdy ktoś otrzyma wiadomość ze stanem gry, po otrzymaniu wiadomości
     def start_new_turn_online(self):
         print('otrzymalem stan gry', shared.game_state)
-
+        self.can_check_for_win = True
         if shared.game_state == 'online_setup':
             # co otrzymuje klient na początku
             if shared.level.active_player == 0 and not shared.is_host:
@@ -1196,6 +1198,7 @@ class Level:
                 self.change_active_player()
                 self.online_active = False
                 self.is_shop_open = False
+                self.can_check_for_win = False
                 online.send_game_state_to_client()
                 shared.pvp_menu.disable()
                 shared.timer_menu.disable()
@@ -1237,7 +1240,7 @@ class Level:
             shared.game_state = 'online_pvp_turn'
             shared.pvp_menu.enable()
             shared.timer_menu.enable()
-            self.pvp_check_for_win()
+            # self.pvp_check_for_win()
 
 
 
