@@ -549,8 +549,9 @@ class Level:
                         winner = 'Czerwony'
                         winner_color = player.color
             draw_game_over_message(shared.window, winner, winner_color)
-            self.end_menu.draw(shared.window)
-            self.end_menu.update(shared.events)
+            if self.end_menu.is_enabled():
+                self.end_menu.draw(shared.window)
+                self.end_menu.update(shared.events)
 
         # rysowanie kursora gestów
         if self.gest_sys_on:
