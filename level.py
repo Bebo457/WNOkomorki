@@ -1129,6 +1129,7 @@ class Level:
 
 
     def give_turn(self):
+        print('otrzymalem stan gry', shared.game_state)
         if shared.game_state == 'pvp_setup':
             if self.active_player == 0:
                 self.change_active_player()
