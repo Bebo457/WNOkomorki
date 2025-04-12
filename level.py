@@ -1115,12 +1115,12 @@ class Level:
             shared.timer_menu.disable()
             shared.pvp_menu.disable()
 
-    # funkcja wywołana za każdym razem gdy ktoś otrzyma wiadomość ze stanem gry
+    # funkcja wywołana za każdym razem gdy ktoś otrzyma wiadomość ze stanem gry, po otrzymaniu wiadomości
     def start_new_turn_online(self):
         # stan na początku tylko
         if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
             shared.level.online_active = False
-        if shared.game_state == 'online_menu':
+        if shared.game_state == 'online_setup':
             shared.game_state = 'online_setup'
             shared.level.pvp_side_menu_setup()
             self.online_active = True
@@ -1181,6 +1181,7 @@ class Level:
                 online.send_game_state_to_client()
             else:
                 self.change_active_player()
+                self.online_active = False
                 shared.game_state = 'online_pvp_turn'
                 self.is_shop_open = False
                 self.shop_menu.disable()
