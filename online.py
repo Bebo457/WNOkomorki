@@ -230,7 +230,8 @@ def send_game_state_to_client(game_state=None):
         if not game_data:
             print("Nie udało się uzyskać danych gry")
             return
-
+        print('wysyłam')
+        print(game_data)
         # Konwertuj na JSON
         json_data = json.dumps(shared.level.save_system_json.convert_to_serializable(game_data))
 
@@ -430,6 +431,8 @@ def send_game_state_to_host(game_state=None):
         if not game_data:
             print("Nie udało się uzyskać danych gry")
             return
+        print('wysyłam')
+        print(game_data)
 
         # Konwertuj na JSON
         json_data = json.dumps(shared.level.save_system_json.convert_to_serializable(game_data))
