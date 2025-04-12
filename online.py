@@ -82,6 +82,7 @@ def receive_messages(client_socket):
                 json_data = message[11:]
                 print("Otrzymano stan gry od hosta")
                 process_game_state(json_data)
+                print('stan gry: ', shared.game_state)
                 shared.level.start_new_turn_online()
             else:
                 print(f"Otrzymano: {message}")
@@ -192,6 +193,7 @@ def handle_client(client_socket, address):
                     if message.startswith("GAME_STATE:"):
                         json_data = message[11:]
                         process_game_state(json_data)
+                        print('stan gry: ', shared.game_state)
                         shared.level.start_new_turn_online()
             elif message.startswith("JSON:"):
                 typ, dane = parse_received_data(message)
