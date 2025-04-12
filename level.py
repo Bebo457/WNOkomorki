@@ -471,8 +471,9 @@ class Level:
         battle_texture = pygame.transform.scale(shared.purple_texture, (self.game_area_width, self.game_area_height))
         self.battle_area_surface.blit(battle_texture, (0, 0))
 
-        shared.timer_menu.draw(window)
-        shared.timer_menu.update(shared.events)
+        if shared.timer_menu.is_enabled():
+            shared.timer_menu.draw(window)
+            shared.timer_menu.update(shared.events)
 
         if shared.game_state != 'pvp_wait':
             if self.pvp_main_menu.is_enabled():
