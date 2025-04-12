@@ -292,7 +292,7 @@ class Level:
         # zmienna potrzebna do wykrywania przecinania
         any_cell_hovered = False
         # obsługa kliknięć myszką
-        if shared.game_state == 'pvp_turn':
+        if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
             # aktualizacja zegara
             self.pvp_check_for_win()
             self.players[self.active_player].timer -= shared.mnoznik
@@ -441,7 +441,7 @@ class Level:
                         self.cutting = False
                         cell.new_pos = np.array([mouse_pos[0], mouse_pos[1]])
 
-        elif shared.game_state == 'pvp_wait':
+        elif shared.game_state == 'pvp_wait' or shared.game_state == 'online_pvp_wait':
             can_skip = True
             for cell in self.cells:
                 cell.check_bridges_to_delete()
@@ -1005,7 +1005,6 @@ class Level:
         RMB = shared.RMB
         mouse_pos = shared.mouse_pos
         window = shared.window
-        print(self.online_active)
         if self.online_active:
             # DZIAŁANIE GRY - analogiczne do pvp_loop_setup
             if self.placing_cell is not None:
@@ -1132,7 +1131,17 @@ class Level:
                 self.online_active = True
                 shared.pvp_menu.enable()
                 shared.timer_menu.enable()
+        elif shared.game_state == 'online_pvp_turn':
+            self.online_active = True
+            self.pvp_main_menu.enable()
+            shared.timer_menu.enable()
 
+
+    def online_turn_loop(self):
+        pass
+
+    def online_pvp_wait_loop(self):
+        pass
 
     def give_turn(self):
         if shared.game_state == 'pvp_setup':
@@ -1184,6 +1193,7 @@ class Level:
             if self.active_player == 0 and shared.is_host:
                 self.change_active_player()
                 self.online_active = False
+                self.is_shop_open = False
                 online.send_game_state_to_client()
                 shared.pvp_menu.disable()
                 shared.timer_menu.disable()
@@ -1197,6 +1207,28 @@ class Level:
                 online.send_game_state_to_host()
                 self.pvp_main_menu.disable()
                 shared.timer_menu.disable()
+        elif shared.game_state == 'online_pvp_turn':
+            self.change_active_player()
+            self.online_active = False
+            self.pvp_main_menu.enable()
+            for cell in self.cells:
+                cell.action_pvp()
+                cell.context_menu.disable()
+                for bridge in cell.bridges:
+                    bridge.spawn_cooldown = shared.pvp_spawn_cooldown
+                for g_bridge in cell.ghost_bridges:
+                    bridge = Bridge(g_bridge[0], g_bridge[1])
+                    bridge.id = len(cell.bridges)
+                    g_bridge[0].bridges.append(bridge)
+            for cell in self.cells:
+                cell.ghost_bridges.clear()
+            shared.game_state = 'online_pvp_wait'
+            shared.pvp_menu.disable()
+            shared.timer_menu.disable()
+            if shared.is_host:
+                online.send_game_state_to_client()
+            else:
+                online.send_game_state_to_host()
 
 
 
