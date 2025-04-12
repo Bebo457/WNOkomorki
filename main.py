@@ -358,7 +358,6 @@ shared.clock = pygame.time.Clock()
 
 # Główna pętla
 while True:
-    print(shared.game_state)
     shared.window.fill(shared.DARK_GRAY)
     # Obliczanie FPS
     global fps
