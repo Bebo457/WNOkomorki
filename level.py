@@ -1139,12 +1139,12 @@ class Level:
                 shared.timer_menu.enable()
         elif shared.game_state == 'online_pvp_turn':
             self.online_active = True
-            self.pvp_main_menu.enable()
-            shared.timer_menu.enable()
+            # self.pvp_main_menu.enable()
+            # shared.timer_menu.enable()
         elif shared.game_state == 'online_pvp_wait':
             self.online_active = True
-            self.pvp_main_menu.enable()
-            shared.timer_menu.enable()
+            self.pvp_main_menu.disable()
+            shared.timer_menu.disable()
 
 
     def give_turn(self):
@@ -1241,8 +1241,20 @@ class Level:
                 for bridge in cell.bridges:
                     bridge.update_can_spawn_this_turn()
             shared.game_state = 'online_pvp_turn'
-            self.pvp_main_menu.enable()
-            shared.timer_menu.enable()
+            if shared.is_host:
+                if self.active_player == 0:
+                    self.pvp_main_menu.enable()
+                    shared.timer_menu.enable()
+                else:
+                    self.pvp_main_menu.disable()
+                    shared.timer_menu.disable()
+            else:
+                if self.active_player == 1:
+                    self.pvp_main_menu.enable()
+                    shared.timer_menu.enable()
+                else:
+                    self.pvp_main_menu.disable()
+                    shared.timer_menu.disable()
 
 
 
