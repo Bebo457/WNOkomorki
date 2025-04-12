@@ -1118,19 +1118,19 @@ class Level:
     # funkcja wywołana za każdym razem gdy ktoś otrzyma wiadomość ze stanem gry, po otrzymaniu wiadomości
     def start_new_turn_online(self):
         print('otrzymalem stan gry', shared.game_state)
-        print(shared.game_state == 'online_setup')
-        print(shared.level.active_player == 0)
-        print(not shared.is_host)
-        if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
-            shared.level.online_active = False
-            shared.pvp_menu.disable()
-            shared.timer_menu.disable()
-        elif shared.game_state == 'online_setup':
-            shared.game_state = 'online_setup'
-            shared.level.pvp_side_menu_setup()
-            self.online_active = True
-            shared.pvp_menu.enable()
-            shared.timer_menu.enable()
+
+        if shared.game_state == 'online_setup':
+            # co otrzymuje klient na początku
+            if shared.level.active_player == 0 and not shared.is_host:
+                shared.level.online_active = False
+                shared.pvp_menu.disable()
+                shared.timer_menu.disable()
+            elif shared.level.active_player == 1 and shared.is_host:
+                shared.game_state = 'online_setup'
+                shared.level.pvp_side_menu_setup()
+                self.online_active = True
+                shared.pvp_menu.enable()
+                shared.timer_menu.enable()
 
 
     def give_turn(self):
@@ -1184,6 +1184,8 @@ class Level:
                 self.change_active_player()
                 self.online_active = False
                 online.send_game_state_to_client()
+                shared.pvp_menu.disable()
+                shared.timer_menu.disable()
             else:
                 self.change_active_player()
                 self.online_active = False
@@ -1191,8 +1193,6 @@ class Level:
                 self.is_shop_open = False
                 self.shop_menu.disable()
                 shared.pvp_menu.disable()
-                shared.timer_menu.enable()
-                self.pvp_main_menu.enable()
                 online.send_game_state_to_host()
                 self.pvp_main_menu.disable()
                 shared.timer_menu.disable()

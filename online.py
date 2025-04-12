@@ -425,7 +425,7 @@ def send_game_state_to_host():
             return
 
         # Konwertuj na JSON
-        json_data = json.dumps(shared.level.save_system_json._convert_to_serializable(game_data))
+        json_data = json.dumps(shared.level.save_system_json.convert_to_serializable(game_data))
 
         # Dodaj prefix do identyfikacji typu wiadomości
         full_message = f"GAME_STATE:{json_data}"
