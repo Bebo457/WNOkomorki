@@ -1005,6 +1005,7 @@ class Level:
         RMB = shared.RMB
         mouse_pos = shared.mouse_pos
         window = shared.window
+        print(self.online_active)
         if self.online_active:
             # DZIAŁANIE GRY - analogiczne do pvp_loop_setup
             if self.placing_cell is not None:
@@ -1125,7 +1126,7 @@ class Level:
                 shared.level.online_active = False
                 shared.pvp_menu.disable()
                 shared.timer_menu.disable()
-            elif shared.level.active_player == 1 and shared.is_host:
+            elif shared.level.active_player == 1 and not shared.is_host:
                 shared.game_state = 'online_setup'
                 shared.level.pvp_side_menu_setup()
                 self.online_active = True
@@ -1197,13 +1198,6 @@ class Level:
                 self.pvp_main_menu.disable()
                 shared.timer_menu.disable()
 
-    # # wywoływane po inicjalizowaniu połączenia po stronie klienta
-    # def initialize_online_game(self):
-    #     if not shared.is_host:
-    #         shared.game_state = 'online_setup'
-    #         self.pvp_side_menu_setup()
-    #         shared.timer_menu.disable()
-    #         shared.pvp_menu.disable()
 
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):

@@ -166,6 +166,7 @@ def handle_client(client_socket, address):
                 shared.client_ip = client_ip
                 shared.client_port = int(client_port)
                 shared.active_connection = True
+                shared.level.online_active = True
                 shared.game_state = 'online_setup'
                 shared.level.pvp_side_menu_setup()
 
