@@ -188,7 +188,6 @@ def handle_client(client_socket, address):
                     # Zapisz wiadomość i ustaw flagę
                     shared.client_message = message
                     shared.received_client_message = True
-                    shared.level.start_new_turn_online()
             elif message.startswith("GAME_STATE:"):
                 json_data = message[11:]
                 process_game_state(json_data)
