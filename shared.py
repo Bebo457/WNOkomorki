@@ -76,7 +76,7 @@ spawn_cooldown_s = 2
 # szerokość linii rysowanej do cięcia i rysowania mostów
 line_width = 5
 # początkowy czas na timerach graczy w sekundach
-timer_time = 120
+timer_time = 1200
 # skala określająca wielkość komórek w pvp, w stosunku do oryginalnych rozmiarów
 pvp_scale = 1
 # okresla po jakim czasie w sekundach spawnuje sie jednostka w fazie pvp_wait
