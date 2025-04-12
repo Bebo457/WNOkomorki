@@ -49,7 +49,7 @@ class Unit:
             pvp_mnoz = 1
             if shared.game_state == 'pvp_wait':
                 pvp_mnoz = shared.pvp_unit_mul
-            self.position += self.bridge.versor * mnoznik * cell_speed * pvp_mnoz
+            self.position += self.bridge.versor * mnoznik * cell_speed * pvp_mnoz * self.bridge.parent.tier
 
 #   funkcja do przejmowania
 
