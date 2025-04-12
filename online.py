@@ -216,7 +216,7 @@ def handle_client(client_socket, address):
             shared.online_status_label.set_title("rozłączono")
 
 
-def send_game_state_to_client():
+def send_game_state_to_client(game_state=None):
     """Wysyła aktualny stan gry do klienta"""
     try:
         if not hasattr(shared, "level") or not hasattr(shared.level, "save_system_json"):
@@ -225,6 +225,8 @@ def send_game_state_to_client():
 
         # Pobierz stan gry jako słownik
         game_data = shared.level.save_system_json.save_game(return_data=True)
+        if game_state:
+            game_data["shared_variables"]["game_state"] = game_state
         if not game_data:
             print("Nie udało się uzyskać danych gry")
             return
@@ -414,7 +416,7 @@ def validate_ip_address(ip):
     except:
         return False
 
-def send_game_state_to_host():
+def send_game_state_to_host(game_state=None):
     """Wysyła aktualny stan gry od klienta do hosta"""
     try:
         if not hasattr(shared, "level") or not hasattr(shared.level, "save_system_json"):
@@ -423,6 +425,8 @@ def send_game_state_to_host():
 
         # Pobierz stan gry jako słownik
         game_data = shared.level.save_system_json.save_game(return_data=True)
+        if game_state:
+            game_data["shared_variables"]["game_state"] = game_state
         if not game_data:
             print("Nie udało się uzyskać danych gry")
             return

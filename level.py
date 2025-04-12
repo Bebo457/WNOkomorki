@@ -1226,12 +1226,13 @@ class Level:
             for cell in self.cells:
                 cell.ghost_bridges.clear()
             shared.game_state = 'online_pvp_wait'
+            new_game_state = 'online_pvp_wait'
             shared.pvp_menu.disable()
             shared.timer_menu.disable()
             if shared.is_host:
-                online.send_game_state_to_client()
+                online.send_game_state_to_client(new_game_state)
             else:
-                online.send_game_state_to_host()
+                online.send_game_state_to_host(new_game_state)
         elif shared.game_state == 'online_pvp_wait':
             self.can_check_for_win = False              # POTENCJALNY PROBLEM
             for cell in self.cells:
