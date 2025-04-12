@@ -224,3 +224,4 @@ def online_correction():
     global game_state, target_game_state
     if target_game_state:
         game_state = target_game_state
+        target_game_state = None
