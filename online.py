@@ -189,10 +189,10 @@ def handle_client(client_socket, address):
                     # Zapisz wiadomość i ustaw flagę
                     shared.client_message = message
                     shared.received_client_message = True
-            elif message.startswith("GAME_STATE:"):
-                json_data = message[11:]
-                process_game_state(json_data)
-                shared.level.start_new_turn_online()
+                    if message.startswith("GAME_STATE:"):
+                        json_data = message[11:]
+                        process_game_state(json_data)
+                        shared.level.start_new_turn_online()
             elif message.startswith("JSON:"):
                 typ, dane = parse_received_data(message)
                 if typ == 'json':
