@@ -1175,6 +1175,7 @@ class Level:
             shared.pvp_menu.disable()
 
     def start_new_turn_online(self):
+        pass
 
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):
