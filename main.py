@@ -385,6 +385,7 @@ while True:
     if previous_LMB_state and not shared.LMB:
         previous_LMB_state = False
         shared.click = True
+    shared.online_correction()
     if shared.game_state == 'main_menu':
         main_menu()
     elif shared.game_state == 'level_menu':

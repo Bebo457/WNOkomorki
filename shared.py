@@ -1,5 +1,7 @@
 import pygame
 
+import shared
+
 # Ustawienia okna
 width_px = None
 height_px = None
@@ -171,6 +173,8 @@ REGEN_SPEED = 0.5  # moc/sekundę/tier
 TIER_CONSTANT = 10
 ATTACK_SPEED = 1
 
+# ONLINE
+target_game_state = None
 
 def set_all_variables():
     global width_px, height_px, window_size, pvp_menu_width, pvp_menu_height
@@ -215,3 +219,8 @@ def set_all_variables():
     offset2 = int(height_px * 0.2350)  # 220/936
     coin_size = int(height_px * 0.0427)  # 40/936
     coin_y_offset = int(height_px * 0.0107)  # 10/936
+
+def online_correction():
+    global game_state, target_game_state
+    if target_game_state:
+        game_state = target_game_state

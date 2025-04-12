@@ -188,6 +188,7 @@ class SaveSystemJSON:
 
     def load_game_from_data(self, game_data):
         """Load game state from provided data structure instead of a file"""
+
         try:
             # Load shared variables
             shared_vars = game_data["shared_variables"]
@@ -195,6 +196,10 @@ class SaveSystemJSON:
             shared.game_mode = shared_vars["game_mode"]
             shared.ip_address = shared_vars["ip_address"]
             shared.port = int(shared_vars["port"])
+
+            # zmienna, która upewnia się że po odczytaniu danych w trybie
+            # online będzie odpowiedni stan gry, nieważne co
+            shared.target_game_state = game_data["shared_variables"]["game_state"]
 
             # First, reset the level
             self.level.reinit()
@@ -368,6 +373,8 @@ class SaveSystemJSON:
                 self.level.pvp_main_menu.enable()
             elif shared.game_state == 'level_classic':
                 self.level.classic_mode_menu.enable()
+            else:
+                pass
 
             print(f"Game loaded successfully from data structure")
             return True

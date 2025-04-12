@@ -106,6 +106,7 @@ def process_game_state(json_data):
             success = shared.level.save_system_json.load_game_from_data(game_data)
             if success:
                 print("Stan gry załadowany pomyślnie")
+                print("odczytany stan gry", shared.game_state)
             else:
                 print("Nie udało się załadować stanu gry")
         else:
