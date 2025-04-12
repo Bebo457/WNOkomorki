@@ -1117,7 +1117,7 @@ class Level:
 
     # funkcja wywołana za każdym razem gdy ktoś otrzyma wiadomość ze stanem gry, po otrzymaniu wiadomości
     def start_new_turn_online(self):
-        # stan na początku tylko
+        print('otrzymalem stan gry', shared.game_state)
         if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
             shared.level.online_active = False
         if shared.game_state == 'online_setup':
@@ -1129,7 +1129,6 @@ class Level:
 
 
     def give_turn(self):
-        print('otrzymalem stan gry', shared.game_state)
         if shared.game_state == 'pvp_setup':
             if self.active_player == 0:
                 self.change_active_player()
