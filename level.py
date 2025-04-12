@@ -1122,7 +1122,6 @@ class Level:
         print(shared.level.active_player == 0)
         print(not shared.is_host)
         if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
-            self.pvp_side_menu_setup()
             shared.level.online_active = False
             shared.pvp_menu.disable()
             shared.timer_menu.disable()

@@ -41,6 +41,7 @@ def connect_to_game():
                 # ------------------------------------TUTAJ DAWAĆ RZECZY PRZY INICJALICAJI KLIENTA ---------------------
                 shared.active_connection = True
                 shared.game_state = 'online_setup'
+                shared.level.pvp_side_menu_setup()
 
                 if hasattr(shared, 'online_status_label'):
                     shared.online_status_label.set_title("połączono")
