@@ -711,66 +711,7 @@ class Level:
         shared.window.blit(timer1_surface, (0.85 * shared.width_px, self.game_area_height * 0.7 + shared.offset1))
         shared.window.blit(timer2_surface, (0.85 * shared.width_px, self.game_area_height * 0.7 + shared.offset2))
 
-    def give_turn(self):
-        if shared.game_state == 'pvp_setup':
-            if self.active_player == 0:
-                self.change_active_player()
-            else:
-                self.change_active_player()
-                shared.game_state = 'pvp_turn'
-                self.is_shop_open = False
-                self.shop_menu.disable()
-                shared.pvp_menu.disable()
-                shared.timer_menu.enable()
-                self.pvp_main_menu.enable()
 
-                # Dodajemy snapshot na początku pierwszej tury
-                if self.playback.recording_enabled:
-                    self.playback.capture_snapshot()
-
-        elif shared.game_state == 'pvp_turn':
-            self.pvp_main_menu.enable()
-            for cell in self.cells:
-                cell.action_pvp()
-                cell.context_menu.disable()
-                for bridge in cell.bridges:
-                    bridge.spawn_cooldown = shared.pvp_spawn_cooldown
-                for g_bridge in cell.ghost_bridges:
-                    bridge = Bridge(g_bridge[0], g_bridge[1])
-                    bridge.id = len(cell.bridges)
-                    g_bridge[0].bridges.append(bridge)
-            for cell in self.cells:
-                cell.ghost_bridges.clear()
-            shared.game_state = 'pvp_wait'
-            shared.pvp_menu.disable()
-        elif shared.game_state == 'pvp_wait' and not self.playback_active:
-            for cell in self.cells:
-                for bridge in cell.bridges:
-                    bridge.update_can_spawn_this_turn()
-            shared.game_state = 'pvp_turn'
-            self.change_active_player()
-            shared.pvp_menu.enable()
-
-            # Dodajemy snapshot na początku każdej nowej tury
-            if self.playback.recording_enabled:
-                self.playback.capture_snapshot()
-        elif shared.game_state == 'online_setup':
-            if self.active_player == 0:
-                self.change_active_player()
-                self.online_active = False
-                online.send_game_state_to_client()
-            else:
-                self.change_active_player()
-                shared.game_state = 'pvp_turn'
-                self.is_shop_open = False
-                self.shop_menu.disable()
-                shared.pvp_menu.disable()
-                shared.timer_menu.enable()
-                self.pvp_main_menu.enable()
-
-                # Dodajemy snapshot na początku pierwszej tury
-                if self.playback.recording_enabled:
-                    self.playback.capture_snapshot()
 
 
     def change_active_player(self):
@@ -1179,13 +1120,76 @@ class Level:
         # stan na początku tylko
         if shared.game_state == 'online_setup' and shared.level.active_player == 0 and not shared.is_host:
             shared.level.online_active = False
-        # if shared.game_state == 'online_menu':
-        #     shared.game_state = 'online_setup'
-        #     shared.level.pvp_side_menu_setup()
-        #     self.online_active = True
-        #     shared.pvp_menu.enable()
-        #     shared.timer_menu.enable()
+        if shared.game_state == 'online_menu':
+            shared.game_state = 'online_setup'
+            shared.level.pvp_side_menu_setup()
+            self.online_active = True
+            shared.pvp_menu.enable()
+            shared.timer_menu.enable()
 
+
+    def give_turn(self):
+        if shared.game_state == 'pvp_setup':
+            if self.active_player == 0:
+                self.change_active_player()
+            else:
+                self.change_active_player()
+                shared.game_state = 'pvp_turn'
+                self.is_shop_open = False
+                self.shop_menu.disable()
+                shared.pvp_menu.disable()
+                shared.timer_menu.enable()
+                self.pvp_main_menu.enable()
+
+                # Dodajemy snapshot na początku pierwszej tury
+                if self.playback.recording_enabled:
+                    self.playback.capture_snapshot()
+
+        elif shared.game_state == 'pvp_turn':
+            self.pvp_main_menu.enable()
+            for cell in self.cells:
+                cell.action_pvp()
+                cell.context_menu.disable()
+                for bridge in cell.bridges:
+                    bridge.spawn_cooldown = shared.pvp_spawn_cooldown
+                for g_bridge in cell.ghost_bridges:
+                    bridge = Bridge(g_bridge[0], g_bridge[1])
+                    bridge.id = len(cell.bridges)
+                    g_bridge[0].bridges.append(bridge)
+            for cell in self.cells:
+                cell.ghost_bridges.clear()
+            shared.game_state = 'pvp_wait'
+            shared.pvp_menu.disable()
+        elif shared.game_state == 'pvp_wait' and not self.playback_active:
+            for cell in self.cells:
+                for bridge in cell.bridges:
+                    bridge.update_can_spawn_this_turn()
+            shared.game_state = 'pvp_turn'
+            self.change_active_player()
+            shared.pvp_menu.enable()
+
+            # Dodajemy snapshot na początku każdej nowej tury
+            if self.playback.recording_enabled:
+                self.playback.capture_snapshot()
+
+        # TRYB ONLINE
+
+        elif shared.game_state == 'online_setup':
+            if self.active_player == 0 and shared.is_host:
+                self.change_active_player()
+                self.online_active = False
+                online.send_game_state_to_client()
+            else:
+                self.change_active_player()
+                shared.game_state = 'online_pvp_turn'
+                self.is_shop_open = False
+                self.shop_menu.disable()
+                shared.pvp_menu.disable()
+                shared.timer_menu.enable()
+                self.pvp_main_menu.enable()
+                online.send_game_state_to_host()
+                self.pvp_main_menu.disable()
+                shared.timer_menu.disable()
 
 
 def draw_dashed_line(screen, color, start_pos, end_pos, dash_length=12, width=line_width):

@@ -411,4 +411,29 @@ def validate_ip_address(ip):
     except:
         return False
 
-# Ta funkcja już istnieje w level.py i powinna być używana stamtąd
+def send_game_state_to_host():
+    """Wysyła aktualny stan gry od klienta do hosta"""
+    try:
+        if not hasattr(shared, "level") or not hasattr(shared.level, "save_system_json"):
+            print("Brak dostępu do obiektu poziomu lub systemu zapisu")
+            return
+
+        # Pobierz stan gry jako słownik
+        game_data = shared.level.save_system_json.save_game(return_data=True)
+        if not game_data:
+            print("Nie udało się uzyskać danych gry")
+            return
+
+        # Konwertuj na JSON
+        json_data = json.dumps(shared.level.save_system_json._convert_to_serializable(game_data))
+
+        # Dodaj prefix do identyfikacji typu wiadomości
+        full_message = f"GAME_STATE:{json_data}"
+
+        if shared.client_socket:
+            shared.client_socket.send(full_message.encode('utf-8'))
+            print("Stan gry wysłany do hosta")
+        else:
+            print("Brak połączenia z hostem")
+    except Exception as e:
+        print(f"Błąd podczas wysyłania stanu gry do hosta: {e}")
