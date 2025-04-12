@@ -783,6 +783,7 @@ class Level:
     def pvp_check_for_win(self):
         # sprawdzanie timera
         for player in self.players:
+            print("winda timera")
             if player.timer <= 0:
                 player.lost = True
                 shared.game_state = 'pvp_end'
@@ -797,9 +798,11 @@ class Level:
             elif cell.color == player2_color:
                 player2_cells += 1
         if player1_cells == 0:
+            print('gracz 1 host ma 0 komorek')
             self.players[0].lost = True
             shared.game_state = 'pvp_end'
         elif player2_cells == 0:
+            print('gracz 2 klient ma 0 komorek')
             self.players[1].lost = True
             shared.game_state = 'pvp_end'
         if shared.game_state == 'pvp_end':

@@ -234,9 +234,10 @@ def return_from_online_menu():
 
 def online_menu_loop():
     """Obsługuje menu gry online"""
-    shared.online_menu.draw(shared.window)
-    shared.online_menu.update(shared.events)
-    online.handle_incoming_connection()
+    if shared.online_menu.is_enabled():
+        shared.online_menu.draw(shared.window)
+        shared.online_menu.update(shared.events)
+        online.handle_incoming_connection()
 
 
 def update_message(value):
