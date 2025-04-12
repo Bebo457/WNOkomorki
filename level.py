@@ -296,7 +296,8 @@ class Level:
         # obsługa kliknięć myszką
         if shared.game_state == 'pvp_turn' or (shared.game_state == 'online_pvp_turn' and self.online_active):
             # aktualizacja zegara
-            if shared.game_state == 'pvp_turn' or self.can_check_for_win: #if shared.game_state == 'pvp_turn' or self.can_check_for_win:
+            if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
+                print('sprawdzam win')
                 self.pvp_check_for_win()
             self.players[self.active_player].timer -= shared.mnoznik
             # Przetwarzanie systemu gestów
@@ -789,17 +790,19 @@ class Level:
             if player.timer <= 0:
                 player.lost = True
                 shared.game_state = 'pvp_end'
-                print("wina timera gracza", player.color)
         # sprawdzanie czy każdy gracz ma żywą komórkę
         player1_cells = 0
         player2_cells = 0
         player1_color = self.players[0].color
         player2_color = self.players[1].color
+
         for cell in self.cells:
             if cell.color == player1_color:
                 player1_cells += 1
             elif cell.color == player2_color:
                 player2_cells += 1
+        if player1_cells + player2_cells < 2:
+            return
         if player1_cells == 0:
             self.players[0].lost = True
             shared.game_state = 'pvp_end'
