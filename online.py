@@ -40,7 +40,7 @@ def connect_to_game():
                 print("Połączenie zostało zaakceptowane przez hosta")
                 # ------------------------------------TUTAJ DAWAĆ RZECZY PRZY INICJALICAJI KLIENTA ---------------------
                 shared.active_connection = True
-                shared.game_state = 'online_setup'  # Zmieniono na online_setup zamiast online_game
+                shared.game_state = 'online_setup'
                 shared.level.pvp_side_menu_setup()
                 if hasattr(shared, 'online_status_label'):
                     shared.online_status_label.set_title("połączono")
@@ -169,7 +169,7 @@ def handle_client(client_socket, address):
                 shared.client_ip = client_ip
                 shared.client_port = int(client_port)
                 shared.active_connection = True
-                shared.game_state = 'online_setup'  # Zmieniono na online_setup zamiast online_game
+                shared.game_state = 'online_setup'
                 shared.level.pvp_side_menu_setup()
 
                 # Aktualizuj status
