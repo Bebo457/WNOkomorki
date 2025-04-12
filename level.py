@@ -1139,8 +1139,8 @@ class Level:
                 shared.timer_menu.enable()
         elif shared.game_state == 'online_pvp_turn':
             self.online_active = True
-            # self.pvp_main_menu.enable()
-            # shared.timer_menu.enable()
+            self.pvp_main_menu.enable()
+            shared.timer_menu.enable()
         elif shared.game_state == 'online_pvp_wait':
             self.online_active = True
             self.pvp_main_menu.disable()
