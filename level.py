@@ -1137,16 +1137,12 @@ class Level:
                 self.online_active = True
                 shared.pvp_menu.enable()
                 shared.timer_menu.enable()
-            elif shared.game_state == 'online_pvp_turn':
-                # Przygotuj interfejs do wykonania ruchu gracza
-                self.online_active = True
-                self.pvp_main_menu.enable()
-                shared.timer_menu.enable()
-            elif shared.game_state == 'online_pvp_wait':
-                # Wyświetl animacje, nie pozwalaj na interakcję
-                self.online_active = True
-                self.pvp_main_menu.disable()
-                shared.timer_menu.disable()
+        elif shared.game_state == 'online_pvp_turn':
+            self.online_active = True
+            self.pvp_main_menu.enable()
+            shared.timer_menu.enable()
+        elif shared.game_state == 'online_pvp_wait':
+            self.online_active = True
 
 
     def give_turn(self):
@@ -1215,34 +1211,23 @@ class Level:
                 self.pvp_main_menu.disable()
                 shared.timer_menu.disable()
         elif shared.game_state == 'online_pvp_turn':
-            # Gracz zakończył planowanie ruchów, przechodzimy do animacji
             self.change_active_player()
             self.can_check_for_win = False
             self.online_active = False
-
-            # Wykonaj akcje dla wszystkich komórek
             for cell in self.cells:
                 cell.action_pvp()
                 cell.context_menu.disable()
-                # Przygotuj jednostki do spawnu
                 for bridge in cell.bridges:
                     bridge.spawn_cooldown = shared.pvp_spawn_cooldown
-                # Konwertuj ghost_bridges na prawdziwe mosty
                 for g_bridge in cell.ghost_bridges:
                     bridge = Bridge(g_bridge[0], g_bridge[1])
-                    bridge.id = len(g_bridge[0].bridges)
+                    bridge.id = len(cell.bridges)
                     g_bridge[0].bridges.append(bridge)
-
-            # Wyczyść ghost_bridges
             for cell in self.cells:
                 cell.ghost_bridges.clear()
-
-            # Zmień stan gry i wyślij dane
             shared.game_state = 'online_pvp_wait'
             shared.pvp_menu.disable()
             shared.timer_menu.disable()
-
-            # Wyślij stan gry do odpowiedniego gracza
             if shared.is_host:
                 online.send_game_state_to_client()
             else:
@@ -1349,7 +1334,6 @@ def draw_game_over_message(screen, winner_name, color):
     # Rysowanie tła za tekstem (opcjonalnie, np. czarny prostokąt)
     pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))  # Tło powiększone o 20 pikseli z każdej strony
     screen.blit(text_surface, text_rect)  # Rysowanie tekstu na ekranie
-
 
 
 
