@@ -105,6 +105,8 @@ def process_game_state(json_data):
         if hasattr(shared, "level") and hasattr(shared.level, "save_system_json"):
             success = shared.level.save_system_json.load_game_from_data(game_data)
             if success:
+                if shared.game_state == 'online_pvp_turn':
+                    shared.game_state = 'online_pvp_wait'
                 print("Stan gry załadowany pomyślnie")
                 print("odczytany stan gry", shared.game_state)
             else:

@@ -225,3 +225,5 @@ def online_correction():
     if target_game_state:
         game_state = target_game_state
         target_game_state = None
+        print('SKORYGOWAŁEM STAN NA', game_state)
+        return True

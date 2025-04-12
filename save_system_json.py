@@ -200,6 +200,7 @@ class SaveSystemJSON:
             # zmienna, która upewnia się że po odczytaniu danych w trybie
             # online będzie odpowiedni stan gry, nieważne co
             shared.target_game_state = game_data["shared_variables"]["game_state"]
+            print('ZAPISAŁEM DO TARGET', shared.target_game_state)
 
             # First, reset the level
             self.level.reinit()
