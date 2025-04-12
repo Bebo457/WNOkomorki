@@ -294,7 +294,7 @@ class Level:
         # zmienna potrzebna do wykrywania przecinania
         any_cell_hovered = False
         # obsługa kliknięć myszką
-        if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
+        if shared.game_state == 'pvp_turn' or (shared.game_state == 'online_pvp_turn' and self.online_active):
             # aktualizacja zegara
             if shared.game_state == 'pvp_turn' or self.can_check_for_win: #if shared.game_state == 'pvp_turn' or self.can_check_for_win:
                 self.pvp_check_for_win()
@@ -478,7 +478,7 @@ class Level:
             shared.timer_menu.draw(window)
             shared.timer_menu.update(shared.events)
 
-        if shared.game_state != 'pvp_wait':
+        if shared.game_state != 'pvp_wait' or shared.game_state != 'online_pvp_wait':
             if self.pvp_main_menu.is_enabled():
                 self.pvp_main_menu.draw(window)
                 self.pvp_main_menu.update(shared.events)
@@ -800,8 +800,6 @@ class Level:
                 player1_cells += 1
             elif cell.color == player2_color:
                 player2_cells += 1
-        print('ilosc komorek gracza 1', player1_cells)
-        print('ilosc komorek gracza 2', player2_cells)
         if player1_cells == 0:
             self.players[0].lost = True
             shared.game_state = 'pvp_end'
@@ -1235,14 +1233,14 @@ class Level:
             else:
                 online.send_game_state_to_host()
         elif shared.game_state == 'online_pvp_wait':
-            self.can_check_for_win = False
+            self.can_check_for_win = False              # POTENCJALNY PROBLEM
             for cell in self.cells:
                 for bridge in cell.bridges:
                     bridge.update_can_spawn_this_turn()
             shared.game_state = 'online_pvp_turn'
-            shared.pvp_menu.enable()
+            self.pvp_main_menu.enable()
             shared.timer_menu.enable()
-            # self.pvp_check_for_win()
+
 
 
 
