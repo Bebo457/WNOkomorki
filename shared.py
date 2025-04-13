@@ -136,7 +136,7 @@ recordings_menu = None
 frame_speed = 1
 
 # Domyślny adres IP hosta, do którego klient będzie się łączył
-host_ip = "192.168.0.191"
+host_ip = "192.168.229.169"
 host_subnet_mask = "255.255.255.0"
 message_to_send = "Cześć!"
 client_socket = None
