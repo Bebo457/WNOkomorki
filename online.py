@@ -53,7 +53,7 @@ def connect_to_game():
                 # Zamknij socket w przypadku odrzucenia
                 client_socket.close()
                 shared.client_socket = None
-                shared.game_state = 'ip_menu'
+                shared.game_state = 'online_menu'
 
         except Exception as e:
             print(f"Błąd podczas wysyłania danych do hosta: {e}")

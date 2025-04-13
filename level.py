@@ -297,7 +297,6 @@ class Level:
         if shared.game_state == 'pvp_turn' or (shared.game_state == 'online_pvp_turn' and self.online_active):
             # aktualizacja zegara
             if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
-                print('sprawdzam win')
                 self.pvp_check_for_win()
             self.players[self.active_player].timer -= shared.mnoznik
             # Przetwarzanie systemu gestów
