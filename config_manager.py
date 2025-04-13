@@ -1,5 +1,6 @@
-import os
 import json
+import os
+
 
 class ConfigManager:
     def __init__(self):
@@ -11,8 +12,7 @@ class ConfigManager:
         self.default_config = {
             "ip_address": "127.0.0.1",
             "port": 8080,
-            "subnet_mask": "255.255.255.0",
-            "host_ip": "127.0.0.1"
+            "subnet_mask": "255.255.255.0"
         }
 
         # Upewnij się, że katalog konfiguracyjny istnieje
@@ -26,13 +26,7 @@ class ConfigManager:
                 with open(self.config_path, 'r', encoding='utf-8') as f:
                     config = json.load(f)
                     # Sprawdź, czy wszystkie potrzebne klucze są obecne
-                    keys_to_check = ["ip_address", "port", "subnet_mask", "host_ip"]
-
-                    # Jeśli brakuje hosta IP, dodaj go z domyślną wartością
-                    if "host_ip" not in config:
-                        config["host_ip"] = self.default_config["host_ip"]
-
-                    # Sprawdź, czy pozostałe klucze istnieją
+                    keys_to_check = ["ip_address", "port", "subnet_mask"]
                     if all(key in config for key in keys_to_check):
                         return config
                     else:
@@ -50,7 +44,7 @@ class ConfigManager:
             print(f"Błąd podczas wczytywania konfiguracji: {e}")
             return self.default_config
 
-    def save_config(self, ip_address, port, subnet_mask, host_ip=None):
+    def save_config(self, ip_address, port, subnet_mask):
         """Zapisuje konfigurację do pliku JSON."""
         try:
             config = {
@@ -58,21 +52,6 @@ class ConfigManager:
                 "port": port,
                 "subnet_mask": subnet_mask
             }
-
-            # Dodaj host_ip jeśli został podany
-            if host_ip is not None:
-                config["host_ip"] = host_ip
-            # W przeciwnym razie zachowaj poprzednią wartość, jeśli istnieje
-            elif os.path.exists(self.config_path):
-                try:
-                    with open(self.config_path, 'r', encoding='utf-8') as f:
-                        old_config = json.load(f)
-                        if "host_ip" in old_config:
-                            config["host_ip"] = old_config["host_ip"]
-                except:
-                    config["host_ip"] = self.default_config["host_ip"]
-            else:
-                config["host_ip"] = self.default_config["host_ip"]
 
             with open(self.config_path, 'w', encoding='utf-8') as f:
                 json.dump(config, f, ensure_ascii=False, indent=4)
