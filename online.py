@@ -38,6 +38,9 @@ def connect_to_game():
             # Sprawdź czy połączenie zostało zaakceptowane
             if response.startswith("ACCEPTED:"):
                 print("Połączenie zostało zaakceptowane przez hosta")
+                from config_manager import ConfigManager
+                config_manager = ConfigManager()
+                config_manager.save_config(shared.ip_address, shared.port, shared.subnet_mask, shared.host_ip)
                 # ------------------------------------TUTAJ DAWAĆ RZECZY PRZY INICJALICAJI KLIENTA ---------------------
                 shared.active_connection = True
                 shared.game_state = 'online_setup'
