@@ -38,9 +38,6 @@ def connect_to_game():
             # Sprawdź czy połączenie zostało zaakceptowane
             if response.startswith("ACCEPTED:"):
                 print("Połączenie zostało zaakceptowane przez hosta")
-                # from config_manager import ConfigManager
-                # config_manager = ConfigManager()
-                # config_manager.save_config(shared.ip_address, shared.port, shared.subnet_mask, shared.host_ip)
                 # ------------------------------------TUTAJ DAWAĆ RZECZY PRZY INICJALICAJI KLIENTA ---------------------
                 shared.active_connection = True
                 shared.game_state = 'online_setup'
@@ -56,7 +53,6 @@ def connect_to_game():
                 # Zamknij socket w przypadku odrzucenia
                 client_socket.close()
                 shared.client_socket = None
-                shared.game_state = 'online_menu'
 
         except Exception as e:
             print(f"Błąd podczas wysyłania danych do hosta: {e}")

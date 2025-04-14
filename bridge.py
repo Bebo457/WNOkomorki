@@ -117,7 +117,7 @@ class Bridge:
     def bridge_action(self):
         if self.parent.type == 'BASIC':
             if self.parent.power > 1:
-                if self.spawn_cooldown >= spawn_cooldown_s/self.parent.tier:
+                if self.spawn_cooldown >= spawn_cooldown_s:
                     self.spawn_unit()
                     self.spawn_cooldown = 0
                 else:
@@ -126,7 +126,7 @@ class Bridge:
     def action_pvp(self):
         if self.pvp_units > 0:
             if self.parent.power > 1:
-                if self.spawn_cooldown >= shared.pvp_spawn_cooldown/self.parent.tier:
+                if self.spawn_cooldown >= shared.pvp_spawn_cooldown:
                     self.spawn_unit()
                     self.spawn_cooldown = 0
                     self.pvp_units -= 1

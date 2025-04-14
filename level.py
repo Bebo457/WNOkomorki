@@ -296,7 +296,7 @@ class Level:
         # obsługa kliknięć myszką
         if shared.game_state == 'pvp_turn' or (shared.game_state == 'online_pvp_turn' and self.online_active):
             # aktualizacja zegara
-            if shared.game_state == 'pvp_turn' or shared.game_state == 'online_pvp_turn':
+            if shared.game_state == 'pvp_turn' or self.can_check_for_win: #if shared.game_state == 'pvp_turn' or self.can_check_for_win:
                 self.pvp_check_for_win()
             self.players[self.active_player].timer -= shared.mnoznik
             # Przetwarzanie systemu gestów
@@ -789,19 +789,17 @@ class Level:
             if player.timer <= 0:
                 player.lost = True
                 shared.game_state = 'pvp_end'
+                print("wina timera gracza", player.color)
         # sprawdzanie czy każdy gracz ma żywą komórkę
         player1_cells = 0
         player2_cells = 0
         player1_color = self.players[0].color
         player2_color = self.players[1].color
-
         for cell in self.cells:
             if cell.color == player1_color:
                 player1_cells += 1
             elif cell.color == player2_color:
                 player2_cells += 1
-        if player1_cells + player2_cells < 2:
-            return
         if player1_cells == 0:
             self.players[0].lost = True
             shared.game_state = 'pvp_end'
@@ -1145,8 +1143,6 @@ class Level:
             shared.timer_menu.enable()
         elif shared.game_state == 'online_pvp_wait':
             self.online_active = True
-            self.pvp_main_menu.disable()
-            shared.timer_menu.disable()
 
 
     def give_turn(self):
@@ -1231,7 +1227,7 @@ class Level:
                 cell.ghost_bridges.clear()
             shared.game_state = 'online_pvp_wait'
             new_game_state = 'online_pvp_wait'
-            self.pvp_main_menu.disable()
+            shared.pvp_menu.disable()
             shared.timer_menu.disable()
             if shared.is_host:
                 online.send_game_state_to_client(new_game_state)
@@ -1243,20 +1239,8 @@ class Level:
                 for bridge in cell.bridges:
                     bridge.update_can_spawn_this_turn()
             shared.game_state = 'online_pvp_turn'
-            if shared.is_host:
-                if self.active_player == 0:
-                    self.pvp_main_menu.enable()
-                    shared.timer_menu.enable()
-                else:
-                    self.pvp_main_menu.disable()
-                    shared.timer_menu.disable()
-            else:
-                if self.active_player == 1:
-                    self.pvp_main_menu.enable()
-                    shared.timer_menu.enable()
-                else:
-                    self.pvp_main_menu.disable()
-                    shared.timer_menu.disable()
+            self.pvp_main_menu.enable()
+            shared.timer_menu.enable()
 
 
 
@@ -1351,6 +1335,5 @@ def draw_game_over_message(screen, winner_name, color):
     # Rysowanie tła za tekstem (opcjonalnie, np. czarny prostokąt)
     pygame.draw.rect(screen, (0, 0, 0), text_rect.inflate(20, 20))  # Tło powiększone o 20 pikseli z każdej strony
     screen.blit(text_surface, text_rect)  # Rysowanie tekstu na ekranie
-
 
 
